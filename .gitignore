@@ -1,0 +1,11 @@
+[Tt]humbs.db
+*.DS_Store
+~$*
+
+.vscode
+.env
+
+__pycache__
+/dist
+/build
+/*.egg-info
