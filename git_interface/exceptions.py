@@ -1,3 +1,6 @@
+"""
+Exceptions that could be raised during one of the git commands
+"""
 class GitException(Exception):
     pass
 

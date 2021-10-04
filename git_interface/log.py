@@ -1,3 +1,6 @@
+"""
+Methods for using the git log command
+"""
 import re
 import subprocess
 from datetime import datetime
@@ -8,6 +11,8 @@ from .constants import EMPTY_REPO_RE, UNKNOWN_REV_RE
 from .datatypes import Log
 from .exceptions import (GitException, NoCommitsException, NoLogsException,
                          UnknownRevisionException)
+
+__all__ = ["get_logs"]
 
 
 def __process_log(stdout_line: str):
@@ -33,7 +38,20 @@ def get_logs(
         max_number: Optional[int] = None,
         since: Optional[datetime] = None,
         until: Optional[datetime] = None):
+    """
+    Generate git logs from a repo
 
+        :param git_repo: Path to the repo
+        :param branch: The branch name, defaults to None
+        :param max_number: max number of logs to get, defaults to None
+        :param since: Filter logs after given date, defaults to None
+        :param until: Filter logs before given date defaults to None
+        :raises NoCommitsException: Repo has no commits
+        :raises UnknownRevisionException: Unknown revision/branch name
+        :raises GitException: Error to do with git
+        :raises NoLogsException: No logs have been generated
+        :return: The generated logs
+    """
     args = ["git", "-C", str(git_repo), "log"]
 
     if branch is not None:

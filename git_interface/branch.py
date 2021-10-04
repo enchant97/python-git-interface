@@ -1,11 +1,24 @@
+"""
+Methods for using the git branch command
+"""
 import subprocess
 from pathlib import Path
-from typing import List, Tuple
+from typing import Tuple
 
 from .exceptions import GitException, NoBranchesException
 
+__all__ = ["get_branches"]
 
-def get_branches(git_repo: Path) -> Tuple[str, List[str]]:
+
+def get_branches(git_repo: Path) -> Tuple[str, Tuple[str]]:
+    """
+    Get the head branch and all others
+
+        :param git_repo: Path to the repo
+        :raises GitException: Error to do with git
+        :raises NoBranchesException: Repo has no branches
+        :return: the head branch and other branches
+    """
     head = ""
     other_branches = []
 
@@ -27,4 +40,4 @@ def get_branches(git_repo: Path) -> Tuple[str, List[str]]:
         else:
             other_branches.append(line[2:])
 
-    return head, other_branches
+    return head, tuple(other_branches)
