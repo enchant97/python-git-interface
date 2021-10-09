@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Optional
 
 from .constants import LS_TREE_LONG_RE, LS_TREE_RE, NOT_VALID_OBJECT_NAME_RE
-from .datatypes import TreeContent, TreeContentTypes
+from .datatypes import TreeContent
 from .exceptions import GitException, UnknownRevisionException
 
 __all__ = ["ls_tree"]

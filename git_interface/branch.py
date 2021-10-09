@@ -11,7 +11,11 @@ from .constants import (BRANCH_ALREADY_EXISTS_RE, BRANCH_NOT_FOUND_RE,
 from .exceptions import (AlreadyExistsException, GitException,
                          NoBranchesException)
 
-__all__ = ["get_branches", "new_branch", "rename_branch", "delete_branch"]
+__all__ = [
+    "get_branches", "new_branch",
+    "copy_branch", "rename_branch",
+    "delete_branch",
+]
 
 
 def get_branches(git_repo: Path) -> Tuple[str, Tuple[str]]:
