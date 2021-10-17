@@ -25,3 +25,7 @@ class NoLogsException(GitException):
 
 class UnknownRevisionException(GitException):
     pass
+
+
+class UnknownRefException(GitException):
+    pass
