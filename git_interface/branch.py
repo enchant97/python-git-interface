@@ -47,7 +47,7 @@ def get_branches(git_repo: Path) -> Tuple[str, Tuple[str]]:
         if line[0] == "*":
             head = line[2:]
         else:
-            other_branches.append(line[2:])
+            other_branches.append(line)
 
     return head, tuple(other_branches)
 
