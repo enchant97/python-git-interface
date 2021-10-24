@@ -1,6 +1,7 @@
 """
 Methods that don't fit in their own file
 """
+import os
 import subprocess
 from pathlib import Path
 from typing import Optional
@@ -44,6 +45,39 @@ def init_repo(
     if default_branch:
         args.append(f"--initial-branch={default_branch}")
     process = subprocess.run(args)
+    if process.returncode != 0:
+        raise GitException(process.stderr.decode())
+
+
+def clone_repo(git_repo: Path, src: str, bare=False, mirror=False):
+    """
+    Clone an exiting repo, please note this
+    method has no way of passing passwords+usernames
+
+        :param git_repo: Repo path to clone into
+        :param src: Where to clone from
+        :param bare: Use --bare git argument, defaults to False
+        :param mirror: Use --mirror git argument, defaults to False
+        :raises ValueError: Both bare and mirror are True
+        :raises GitException: Error to do with git
+    """
+    args = ["git", "clone", src, git_repo]
+
+    # disables interactive password prompt
+    env = {
+        **os.environ,
+        "GCM_INTERACTIVE": "never",
+        "GIT_TERMINAL_PROMPT":"0"
+    }
+
+    if mirror and bare:
+        raise ValueError("both bare and mirror cannot be used at same time")
+    elif bare:
+        args.append("--bare")
+    elif mirror:
+        args.append("--mirror")
+
+    process = subprocess.run(args, capture_output=True, env=env)
     if process.returncode != 0:
         raise GitException(process.stderr.decode())
 
