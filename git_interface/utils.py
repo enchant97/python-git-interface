@@ -61,7 +61,7 @@ def clone_repo(git_repo: Path, src: str, bare=False, mirror=False):
         :raises ValueError: Both bare and mirror are True
         :raises GitException: Error to do with git
     """
-    args = ["git", "clone", src, git_repo]
+    args = ["git", "clone", src, str(git_repo)]
 
     # disables interactive password prompt
     env = {
