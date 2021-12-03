@@ -29,3 +29,7 @@ class UnknownRevisionException(GitException):
 
 class UnknownRefException(GitException):
     pass
+
+
+class PathDoesNotExistInRevException(GitException):
+    pass
