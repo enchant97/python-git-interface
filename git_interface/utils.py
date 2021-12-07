@@ -16,6 +16,16 @@ __all__ = [
 ]
 
 
+def get_version():
+    """
+    Gets the git version
+
+        :return: The version
+    """
+    args = ("git", "version")
+    return subprocess.run(args, capture_output=True).stdout.decode().strip()
+
+
 def init_repo(
         repo_dir: Path,
         repo_name: str,
