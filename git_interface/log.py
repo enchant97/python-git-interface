@@ -17,13 +17,15 @@ __all__ = ["get_logs"]
 
 def __process_log(stdout_line: str):
     parts = stdout_line.split(";;")
-    if len(parts) != 4:
-        raise ValueError("invalid log line: {stdout_line}")
+    if len(parts) != 6:
+        raise ValueError(f"invalid log line: {stdout_line}")
     return Log(
         parts[0],
         parts[1],
-        datetime.fromisoformat(parts[2]),
-        parts[3]
+        parts[2],
+        parts[3],
+        datetime.fromisoformat(parts[4]),
+        parts[5],
     )
 
 
@@ -62,7 +64,8 @@ def get_logs(
         args.append(f"--since={since.isoformat()}")
     if until is not None:
         args.append(f"--until={until.isoformat()}")
-    args.append("--pretty=%H;;%ae;;%cI;;%s")
+    # formats: https://git-scm.com/docs/pretty-formats
+    args.append("--pretty=%H;;%P;;%ae;;%an;;%cI;;%s")
 
     process_status = subprocess.run(
         args,

@@ -30,7 +30,9 @@ class Log:
     Represents a single git log
     """
     commit_hash: str
+    parent_hash: str
     author_email: str
+    author_name: str
     commit_date: datetime
     subject: str
 
