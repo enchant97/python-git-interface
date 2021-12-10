@@ -10,7 +10,7 @@ __all__ = ["get_object_size", "get_object_type", "get_pretty_print"]
 
 
 def __cat_file_command(git_repo: Path, tree_ish: str, file_path: str, *flags) -> bytes:
-    args = ["git", "-C", str(git_repo), "show", f"{tree_ish}:{file_path}"]
+    args = ["git", "-C", str(git_repo), "cat-file", f"{tree_ish}:{file_path}"]
     args.extend(flags)
 
     process_status = subprocess.run(args, capture_output=True)
