@@ -20,6 +20,9 @@ class ArchiveTypes(Enum):
 
 
 class TreeContentTypes(Enum):
+    """
+    Tree content types
+    """
     TREE = "tree"
     BLOB = "blob"
 

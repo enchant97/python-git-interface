@@ -1,11 +1,10 @@
 """
-Methods to access:
-    ls-tree
+Methods for using the 'ls-tree' command
 """
 import re
 import subprocess
 from pathlib import Path
-from typing import Optional
+from typing import Iterator, Optional
 
 from .constants import LS_TREE_LONG_RE, LS_TREE_RE, NOT_VALID_OBJECT_NAME_RE
 from .datatypes import TreeContent
@@ -48,7 +47,7 @@ def ls_tree(
         tree_ish: str,
         recursive: bool,
         use_long: bool,
-        path: Optional[Path] = None) -> map:
+        path: Optional[Path] = None) -> Iterator[TreeContent]:
     """
     Get the tree of objects in repo
 

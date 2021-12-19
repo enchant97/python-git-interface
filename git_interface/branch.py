@@ -1,5 +1,5 @@
 """
-Methods for using the git branch command
+Methods for using the 'branch' command
 """
 import re
 import subprocess

@@ -1,3 +1,6 @@
+"""
+Methods for using the 'rev-list' command
+"""
 import re
 import subprocess
 from pathlib import Path
@@ -57,7 +60,7 @@ def get_disk_usage(git_repo: Path, branch: Optional[str] = None) -> int:
     return int(_rev_list(git_repo, branch, "--disk-usage"))
 
 
-def get_rev_list(git_repo: Path, branch: Optional[str] = None) -> list:
+def get_rev_list(git_repo: Path, branch: Optional[str] = None) -> list[str]:
     """
     Get a repos revisions
 

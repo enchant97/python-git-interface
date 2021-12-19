@@ -1,11 +1,11 @@
 """
-Methods for using the git log command
+Methods for using the 'log' command
 """
 import re
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Iterator, Optional
 
 from .constants import EMPTY_REPO_RE, UNKNOWN_REV_RE
 from .datatypes import Log
@@ -15,7 +15,7 @@ from .exceptions import (GitException, NoCommitsException, NoLogsException,
 __all__ = ["get_logs"]
 
 
-def __process_log(stdout_line: str):
+def __process_log(stdout_line: str) -> Log:
     parts = stdout_line.split(";;")
     if len(parts) != 6:
         raise ValueError(f"invalid log line: {stdout_line}")
@@ -29,7 +29,7 @@ def __process_log(stdout_line: str):
     )
 
 
-def __process_logs(stdout: str):
+def __process_logs(stdout: str) -> Iterator[Log]:
     log_lines = stdout.strip().split("\n")
     return map(__process_log, log_lines)
 
@@ -39,7 +39,7 @@ def get_logs(
         branch: Optional[str] = None,
         max_number: Optional[int] = None,
         since: Optional[datetime] = None,
-        until: Optional[datetime] = None):
+        until: Optional[datetime] = None) -> Iterator[Log]:
     """
     Generate git logs from a repo
 

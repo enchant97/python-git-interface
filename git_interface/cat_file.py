@@ -1,3 +1,6 @@
+"""
+Methods for using the 'cat-file' command
+"""
 import re
 import subprocess
 from pathlib import Path

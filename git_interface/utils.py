@@ -16,14 +16,18 @@ __all__ = [
 ]
 
 
-def get_version():
+def get_version() -> str:
     """
     Gets the git version
 
+        :raises GitException: Error to do with git
         :return: The version
     """
     args = ("git", "version")
-    return subprocess.run(args, capture_output=True).stdout.decode().strip()
+    process_status = subprocess.run(args, capture_output=True)
+    if process_status.returncode != 0:
+        raise GitException(process_status.stderr.decode())
+    return process_status.stdout.decode().strip()
 
 
 def init_repo(
