@@ -1,12 +1,12 @@
 """
 Constants
 """
-EMPTY_REPO_RE = r"fatal: your current branch '\w+' does not have any commits yet"
-UNKNOWN_REV_RE = r"fatal: ambiguous argument '\w+': unknown revision or path not in the working tree."
-BRANCH_ALREADY_EXISTS_RE = r"fatal: A branch named '\w+' already exists."
-BRANCH_NOT_FOUND_RE = r"error: branch '\w+' not found."
-BRANCH_REFNAME_NOT_FOUND_RE = r"error: refname \w+ not found"
-NOT_VALID_OBJECT_NAME_RE = r"fatal: Not a valid object name \w+"
+EMPTY_REPO_RE = r"fatal: your current branch '.+' does not have any commits yet"
+UNKNOWN_REV_RE = r"fatal: ambiguous argument '.+': unknown revision or path not in the working tree."
+BRANCH_ALREADY_EXISTS_RE = r"fatal: A branch named '.+' already exists."
+BRANCH_NOT_FOUND_RE = r"error: branch '.+' not found."
+BRANCH_REFNAME_NOT_FOUND_RE = r"error: refname .+ not found"
+NOT_VALID_OBJECT_NAME_RE = r"fatal: Not a valid object name .+"
 INVALID_OBJECT_NAME = r"fatal: invalid object name '.+'"
 PATH_DOES_NOT_EXIST = r"fatal: path '.+' does not exist in '.+'"
 # git ls-tree <tree-ish>
