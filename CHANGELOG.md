@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.2] - 2021-12-19
+### Changed
+- Docs hosted at: readthedocs
+- Improve typing hints
+- Missing doc strings
+- Handle if git errors in `get_version()` method
+
+### Fixed
+- Generic GitException class being used instead of undetected ref error
+
 ## [0.5.1] - 2021-12-10
 ### Added
 - Read file from a repo
@@ -68,6 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Log viewing
 - Init repo
 
+[0.5.2]: https://github.com/enchant97/python-git-interface/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/enchant97/python-git-interface/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/enchant97/python-git-interface/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/enchant97/python-git-interface/compare/v0.4.0...v0.4.1
