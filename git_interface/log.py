@@ -3,9 +3,10 @@ Methods for using the 'log' command
 """
 import re
 import subprocess
+from collections.abc import Iterator
 from datetime import datetime
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Optional
 
 from .constants import EMPTY_REPO_RE, UNKNOWN_REV_RE
 from .datatypes import Log

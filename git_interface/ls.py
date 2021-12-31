@@ -3,8 +3,9 @@ Methods for using the 'ls-tree' command
 """
 import re
 import subprocess
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Optional
 
 from .constants import LS_TREE_LONG_RE, LS_TREE_RE, NOT_VALID_OBJECT_NAME_RE
 from .datatypes import TreeContent
