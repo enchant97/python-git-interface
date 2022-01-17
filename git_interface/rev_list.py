@@ -38,7 +38,7 @@ def get_commit_count(git_repo: Path, branch: Optional[str] = None) -> int:
     """
     Get a repos commit count
 
-        :param git_repo: Repo path to clone into
+        :param git_repo: Path to the repo
         :param branch: Branch to filter, defaults to None
         :raises UnknownRevisionException: Unknown tree_ish
         :raises GitException: Error to do with git
@@ -51,7 +51,7 @@ def get_disk_usage(git_repo: Path, branch: Optional[str] = None) -> int:
     """
     Get a size of the repo
 
-        :param git_repo: Repo path to clone into
+        :param git_repo: Path to the repo
         :param branch: Branch to filter, defaults to None
         :raises UnknownRevisionException: Unknown tree_ish
         :raises GitException: Error to do with git
@@ -64,7 +64,7 @@ def get_rev_list(git_repo: Path, branch: Optional[str] = None) -> list[str]:
     """
     Get a repos revisions
 
-        :param git_repo: Repo path to clone into
+        :param git_repo: Path to the repo
         :param branch: Branch to filter, defaults to None
         :raises UnknownRevisionException: Unknown tree_ish
         :raises GitException: Error to do with git

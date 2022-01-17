@@ -34,6 +34,12 @@ class AlreadyExistsException(GitException):
     pass
 
 
+class DoesNotExistException(GitException):
+    """
+    Raised when something does not exist e.g. tag
+    """
+
+
 class NoLogsException(GitException):
     """
     Raised when a repository has no logs available
