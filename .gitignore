@@ -4,6 +4,8 @@
 
 .vscode
 .env
+.venv
+test-data
 
 __pycache__
 /dist
