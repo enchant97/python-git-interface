@@ -3,6 +3,7 @@ Methods for using git symbolic-ref command
 """
 import subprocess
 from pathlib import Path
+from typing import Union
 
 from .exceptions import GitException, UnknownRefException
 
@@ -29,7 +30,7 @@ def _raise_known_errors(process_status: subprocess.CompletedProcess, ref: str):
         raise GitException(process_status.stderr.decode())
 
 
-def change_symbolic_ref(git_repo: Path, name: str, ref: str):
+def change_symbolic_ref(git_repo: Union[Path, str], name: str, ref: str):
     """
     Change a symbolic ref in repo
 
@@ -44,7 +45,7 @@ def change_symbolic_ref(git_repo: Path, name: str, ref: str):
     _raise_known_errors(process_status, ref)
 
 
-def get_symbolic_ref(git_repo: Path, name: str) -> str:
+def get_symbolic_ref(git_repo: Union[Path, str], name: str) -> str:
     """
     Get a symbolic ref in repo
 
@@ -59,7 +60,7 @@ def get_symbolic_ref(git_repo: Path, name: str) -> str:
     return process_status.stdout.decode().strip()
 
 
-def delete_symbolic_ref(git_repo: Path, name: str):
+def delete_symbolic_ref(git_repo: Union[Path, str], name: str):
     """
     Delete a symbolic ref in repo
 
@@ -73,7 +74,7 @@ def delete_symbolic_ref(git_repo: Path, name: str):
     _raise_known_errors(process_status, name)
 
 
-def get_active_branch(git_repo: Path) -> str:
+def get_active_branch(git_repo: Union[Path, str]) -> str:
     """
     Get the active (HEAD) reference
 
@@ -84,7 +85,7 @@ def get_active_branch(git_repo: Path) -> str:
     return get_symbolic_ref(git_repo, "HEAD")
 
 
-def change_active_branch(git_repo: Path, branch: str):
+def change_active_branch(git_repo: Union[Path, str], branch: str):
     """
     Change the active (HEAD) reference
 

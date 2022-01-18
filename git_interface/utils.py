@@ -8,6 +8,7 @@ from typing import Generator, Optional, Union
 
 from .datatypes import ArchiveTypes
 from .exceptions import AlreadyExistsException, GitException
+from .helpers import ensure_path
 
 __all__ = [
     "get_version", "init_repo",
@@ -64,7 +65,7 @@ def init_repo(
         raise GitException(process.stderr.decode())
 
 
-def clone_repo(git_repo: Path, src: str, bare=False, mirror=False):
+def clone_repo(git_repo: Union[Path, str], src: str, bare=False, mirror=False):
     """
     Clone an exiting repo, please note this
     method has no way of passing passwords+usernames
@@ -82,7 +83,7 @@ def clone_repo(git_repo: Path, src: str, bare=False, mirror=False):
     env = {
         **os.environ,
         "GCM_INTERACTIVE": "never",
-        "GIT_TERMINAL_PROMPT":"0"
+        "GIT_TERMINAL_PROMPT": "0"
     }
 
     if mirror and bare:
@@ -97,28 +98,30 @@ def clone_repo(git_repo: Path, src: str, bare=False, mirror=False):
         raise GitException(process.stderr.decode())
 
 
-def get_description(git_repo: Path) -> str:
+def get_description(git_repo: Union[Path, str]) -> str:
     """
     Gets the set description for a repo
 
         :param git_repo: Path to the repo
         :return: The description
     """
+    git_repo = ensure_path(git_repo)
     with open(git_repo / "description", "r") as fo:
         return fo.read()
 
 
-def set_description(git_repo: Path, description: str):
+def set_description(git_repo: Union[Path, str], description: str):
     """
     Sets the set description for a repo
 
         :param git_repo: Path to the repo
     """
+    git_repo = ensure_path(git_repo)
     with open(git_repo / "description", "w") as fo:
         fo.write(description)
 
 
-def run_maintenance(git_repo: Path):
+def run_maintenance(git_repo: Union[Path, str]):
     """
     Run a maintenance git command to specified repo
 
@@ -132,7 +135,7 @@ def run_maintenance(git_repo: Path):
 
 
 def get_archive(
-        git_repo: Path,
+        git_repo: Union[Path, str],
         archive_type: ArchiveTypes,
         tree_ish: str = "HEAD") -> bytes:
     """

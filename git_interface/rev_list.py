@@ -4,7 +4,7 @@ Methods for using the 'rev-list' command
 import re
 import subprocess
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from .constants import UNKNOWN_REV_RE
 from .exceptions import GitException, UnknownRevisionException
@@ -16,7 +16,7 @@ __all__ = [
 
 
 def _rev_list(
-        git_repo: Path,
+        git_repo: Union[Path, str],
         branch: Optional[str] = None,
         operator: Optional[str] = None) -> str:
     if branch is None:
@@ -34,7 +34,7 @@ def _rev_list(
     return process_status.stdout.decode()
 
 
-def get_commit_count(git_repo: Path, branch: Optional[str] = None) -> int:
+def get_commit_count(git_repo: Union[Path, str], branch: Optional[str] = None) -> int:
     """
     Get a repos commit count
 
@@ -47,7 +47,7 @@ def get_commit_count(git_repo: Path, branch: Optional[str] = None) -> int:
     return int(_rev_list(git_repo, branch, "--count"))
 
 
-def get_disk_usage(git_repo: Path, branch: Optional[str] = None) -> int:
+def get_disk_usage(git_repo: Union[Path, str], branch: Optional[str] = None) -> int:
     """
     Get a size of the repo
 
@@ -60,7 +60,7 @@ def get_disk_usage(git_repo: Path, branch: Optional[str] = None) -> int:
     return int(_rev_list(git_repo, branch, "--disk-usage"))
 
 
-def get_rev_list(git_repo: Path, branch: Optional[str] = None) -> list[str]:
+def get_rev_list(git_repo: Union[Path, str], branch: Optional[str] = None) -> list[str]:
     """
     Get a repos revisions
 

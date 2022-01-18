@@ -4,6 +4,7 @@ Methods for using the 'cat-file' command
 import re
 import subprocess
 from pathlib import Path
+from typing import Union
 
 from .constants import NOT_VALID_OBJECT_NAME_RE
 from .datatypes import TreeContentTypes
@@ -12,7 +13,7 @@ from .exceptions import GitException, UnknownRevisionException
 __all__ = ["get_object_size", "get_object_type", "get_pretty_print"]
 
 
-def __cat_file_command(git_repo: Path, tree_ish: str, file_path: str, *flags) -> bytes:
+def __cat_file_command(git_repo: Union[Path, str], tree_ish: str, file_path: str, *flags) -> bytes:
     args = ["git", "-C", str(git_repo), "cat-file", f"{tree_ish}:{file_path}"]
     args.extend(flags)
 
@@ -27,7 +28,7 @@ def __cat_file_command(git_repo: Path, tree_ish: str, file_path: str, *flags) ->
     return process_status.stdout
 
 
-def get_object_size(git_repo: Path, tree_ish: str, file_path: str) -> int:
+def get_object_size(git_repo: Union[Path, str], tree_ish: str, file_path: str) -> int:
     """
     Gets the objects size from repo
 
@@ -41,7 +42,7 @@ def get_object_size(git_repo: Path, tree_ish: str, file_path: str) -> int:
     return int(__cat_file_command(git_repo, tree_ish, file_path, "-s"))
 
 
-def get_object_type(git_repo: Path, tree_ish: str, file_path: str) -> TreeContentTypes:
+def get_object_type(git_repo: Union[Path, str], tree_ish: str, file_path: str) -> TreeContentTypes:
     """
     Gets the object type from repo
 
@@ -56,7 +57,7 @@ def get_object_type(git_repo: Path, tree_ish: str, file_path: str) -> TreeConten
     return TreeContentTypes(output)
 
 
-def get_pretty_print(git_repo: Path, tree_ish: str, file_path: str) -> bytes:
+def get_pretty_print(git_repo: Union[Path, str], tree_ish: str, file_path: str) -> bytes:
     """
     Gets a object from repo
 

@@ -4,11 +4,13 @@ Methods for using the 'branch' command
 import re
 import subprocess
 from pathlib import Path
+from typing import Union
 
 from .constants import (BRANCH_ALREADY_EXISTS_RE, BRANCH_NOT_FOUND_RE,
                         BRANCH_REFNAME_NOT_FOUND_RE)
 from .exceptions import (AlreadyExistsException, GitException,
                          NoBranchesException)
+from .helpers import ensure_path
 
 __all__ = [
     "get_branches", "new_branch",
@@ -17,7 +19,7 @@ __all__ = [
 ]
 
 
-def get_branches(git_repo: Path) -> tuple[str, tuple[str]]:
+def get_branches(git_repo: Union[Path, str]) -> tuple[str, tuple[str]]:
     """
     Get the head branch and all others
 
@@ -26,6 +28,7 @@ def get_branches(git_repo: Path) -> tuple[str, tuple[str]]:
         :raises NoBranchesException: Repo has no branches
         :return: the head branch and other branches
     """
+    git_repo = ensure_path(git_repo)
     head = ""
     other_branches = []
 
@@ -51,7 +54,7 @@ def get_branches(git_repo: Path) -> tuple[str, tuple[str]]:
     return head, tuple(other_branches)
 
 
-def new_branch(git_repo: Path, branch_name: str):
+def new_branch(git_repo: Union[Path, str], branch_name: str):
     """
     Create a new branch in repo
 
@@ -70,7 +73,7 @@ def new_branch(git_repo: Path, branch_name: str):
         raise GitException(stderr)
 
 
-def copy_branch(git_repo: Path, branch_name: str, new_branch: str):
+def copy_branch(git_repo: Union[Path, str], branch_name: str, new_branch: str):
     """
     Copy an existing branch to a new branch in repo (uses --force)
 
@@ -91,7 +94,7 @@ def copy_branch(git_repo: Path, branch_name: str, new_branch: str):
         raise GitException(stderr)
 
 
-def rename_branch(git_repo: Path, branch_name: str, new_branch: str):
+def rename_branch(git_repo: Union[Path, str], branch_name: str, new_branch: str):
     """
     Rename an existing branch (uses --force)
 
@@ -112,7 +115,7 @@ def rename_branch(git_repo: Path, branch_name: str, new_branch: str):
         raise GitException(stderr)
 
 
-def delete_branch(git_repo: Path, branch_name: str):
+def delete_branch(git_repo: Union[Path, str], branch_name: str):
     """
     Delete an existing branch (uses --force)
 

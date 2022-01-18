@@ -38,6 +38,7 @@ class DoesNotExistException(GitException):
     """
     Raised when something does not exist e.g. tag
     """
+    pass
 
 
 class NoLogsException(GitException):
