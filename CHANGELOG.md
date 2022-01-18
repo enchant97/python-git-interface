@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2022-01-18
+### Added
+- Git tag functionality
+- Buffered reading of files from repositories
+- Documentation hosted at [readthedocs](https://python-git-interface.readthedocs.io/en/stable/)
+
+### Changed
+- Strings can be used instead of `pathlib.Path` objects for `git_repo` parameter
+- Missing docstrings
+
+### Removed
+- Drop Python 3.8 support and below
+
 ## [0.5.2] - 2021-12-19
 ### Changed
 - Docs hosted at: readthedocs
@@ -78,6 +91,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Log viewing
 - Init repo
 
+[0.6.0]: https://github.com/enchant97/python-git-interface/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/enchant97/python-git-interface/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/enchant97/python-git-interface/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/enchant97/python-git-interface/compare/v0.4.1...v0.5.0
