@@ -10,6 +10,11 @@ from .constants import TAG_ALREADY_EXISTS_RE, TAG_NOT_FOUND_RE
 from .exceptions import (AlreadyExistsException, DoesNotExistException,
                          GitException)
 
+__all__ = [
+    "list_tags", "create_tag",
+    "delete_tag",
+]
+
 
 def list_tags(git_repo: Path | str, tag_pattern: Optional[str] = None) -> list[str]:
     """
