@@ -13,4 +13,5 @@ Reference
    rev_list
    show
    symbolic_ref
+   tag
    utils
