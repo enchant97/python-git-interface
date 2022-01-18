@@ -4,7 +4,7 @@ Methods that don't fit in their own file
 import os
 import subprocess
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, Optional, Union
 
 from .datatypes import ArchiveTypes
 from .exceptions import AlreadyExistsException, GitException
@@ -156,7 +156,7 @@ def get_archive(
 
 
 def get_archive_buffered(
-        git_repo: Path | str,
+        git_repo: Union[Path, str],
         archive_type: ArchiveTypes,
         tree_ish: str = "HEAD",
         bufsize: int = -1) -> Generator[bytes, None, None]:

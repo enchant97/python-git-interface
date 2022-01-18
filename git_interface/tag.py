@@ -4,7 +4,7 @@ Methods for using the 'tag' command
 import re
 import subprocess
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from .constants import TAG_ALREADY_EXISTS_RE, TAG_NOT_FOUND_RE
 from .exceptions import (AlreadyExistsException, DoesNotExistException,
@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 
-def list_tags(git_repo: Path | str, tag_pattern: Optional[str] = None) -> list[str]:
+def list_tags(git_repo: Union[Path, str], tag_pattern: Optional[str] = None) -> list[str]:
     """
     List all git tags or filter with a wildcard pattern
 
@@ -38,7 +38,7 @@ def list_tags(git_repo: Path | str, tag_pattern: Optional[str] = None) -> list[s
     return process_status.stdout.decode().strip().split("\n")
 
 
-def create_tag(git_repo: Path | str, tag_name: str, commit_hash: Optional[str] = None):
+def create_tag(git_repo: Union[Path, str], tag_name: str, commit_hash: Optional[str] = None):
     """
     Create a new lightweight tag
 
@@ -62,7 +62,7 @@ def create_tag(git_repo: Path | str, tag_name: str, commit_hash: Optional[str] =
         raise GitException(stderr)
 
 
-def delete_tag(git_repo: Path | str, tag_name: str) -> str:
+def delete_tag(git_repo: Union[Path, str], tag_name: str) -> str:
     """
     Delete a tag
 

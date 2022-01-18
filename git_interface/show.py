@@ -4,7 +4,7 @@ Methods for using the 'show' command
 import re
 import subprocess
 from pathlib import Path
-from typing import Generator
+from typing import Generator, Union
 
 from .constants import INVALID_OBJECT_NAME, PATH_DOES_NOT_EXIST
 from .exceptions import (GitException, PathDoesNotExistInRevException,
@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-def show_file(git_repo: Path | str, tree_ish: str, file_path: str) -> bytes:
+def show_file(git_repo: Union[Path, str], tree_ish: str, file_path: str) -> bytes:
     """
     Read a file from a repository
 
@@ -43,7 +43,7 @@ def show_file(git_repo: Path | str, tree_ish: str, file_path: str) -> bytes:
 
 
 def show_file_buffered(
-        git_repo: Path | str,
+        git_repo: Union[Path, str],
         tree_ish: str,
         file_path: str,
         bufsize: int = -1) -> Generator[bytes, None, None]:
