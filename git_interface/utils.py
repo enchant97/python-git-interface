@@ -4,15 +4,16 @@ Methods that don't fit in their own file
 import os
 import subprocess
 from pathlib import Path
-from typing import Optional
+from typing import Generator, Optional
 
 from .datatypes import ArchiveTypes
 from .exceptions import AlreadyExistsException, GitException
 
 __all__ = [
-    "init_repo", "get_description",
+    "get_version", "init_repo",
+    "clone_repo", "get_description",
     "set_description", "run_maintenance",
-    "get_archive",
+    "get_archive", "get_archive_buffered",
 ]
 
 
@@ -152,3 +153,37 @@ def get_archive(
     if process.returncode != 0:
         raise GitException(process.stderr.decode())
     return process.stdout
+
+
+def get_archive_buffered(
+        git_repo: Path | str,
+        archive_type: ArchiveTypes,
+        tree_ish: str = "HEAD",
+        bufsize: int = -1) -> Generator[bytes, None, None]:
+    """
+    get a archive of a git repo, but using a buffered read
+
+        :param git_repo: Where the repo is
+        :param archive_type: What archive type will be created
+        :param tree_ish: What commit/branch to save, defaults to "HEAD"
+        :param bufsize: The buffer size to pass into subprocess.Popen, defaults to -1
+        :raises GitException: Error to do with git
+        :yield: Each read content section
+    """
+    # this allows for strings to be passed
+    if isinstance(archive_type, ArchiveTypes):
+        archive_type = archive_type.value
+
+    with subprocess.Popen(
+        ["git", "-C", str(git_repo), "archive", f"--format={archive_type}", tree_ish],
+        bufsize=bufsize,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    ) as process:
+        for line in process.stdout:
+            yield line
+
+        return_code = process.wait()
+        if return_code != 0:
+            stderr = process.stderr.read().decode()
+            raise GitException(stderr)
