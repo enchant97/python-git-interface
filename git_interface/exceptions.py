@@ -2,6 +2,12 @@
 Exceptions that could be raised during one of the git commands
 """
 
+class BufferedProcessError(Exception):
+    """
+    Exception raised when non-zero return code is found
+    """
+    pass
+
 
 class GitException(Exception):
     """
