@@ -2,13 +2,16 @@
 Methods that don't fit in their own file
 """
 import os
-import subprocess
+from collections.abc import Coroutine
 from pathlib import Path
-from typing import Generator, Optional, Union
+from typing import Any, AsyncGenerator, Generator, Optional, Union
+
+import aiofiles
 
 from .datatypes import ArchiveTypes
-from .exceptions import AlreadyExistsException, GitException
-from .helpers import ensure_path
+from .exceptions import (AlreadyExistsException, BufferedProcessError,
+                         GitException)
+from .helpers import ensure_path, subprocess_run, subprocess_run_buffered
 
 __all__ = [
     "get_version", "init_repo",
@@ -18,7 +21,7 @@ __all__ = [
 ]
 
 
-def get_version() -> str:
+async def get_version() -> Coroutine[Any, Any, str]:
     """
     Gets the git version
 
@@ -26,13 +29,13 @@ def get_version() -> str:
         :return: The version
     """
     args = ("git", "version")
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
     if process_status.returncode != 0:
         raise GitException(process_status.stderr.decode())
     return process_status.stdout.decode().strip()
 
 
-def init_repo(
+async def init_repo(
         repo_dir: Path,
         repo_name: str,
         bare: bool = True,
@@ -60,12 +63,12 @@ def init_repo(
         args.append("--bare")
     if default_branch:
         args.append(f"--initial-branch={default_branch}")
-    process = subprocess.run(args)
+    process = await subprocess_run(args)
     if process.returncode != 0:
         raise GitException(process.stderr.decode())
 
 
-def clone_repo(git_repo: Union[Path, str], src: str, bare=False, mirror=False):
+async def clone_repo(git_repo: Union[Path, str], src: str, bare=False, mirror=False):
     """
     Clone an exiting repo, please note this
     method has no way of passing passwords+usernames
@@ -93,12 +96,12 @@ def clone_repo(git_repo: Union[Path, str], src: str, bare=False, mirror=False):
     elif mirror:
         args.append("--mirror")
 
-    process = subprocess.run(args, capture_output=True, env=env)
+    process = await subprocess_run(args, capture_output=True, env=env)
     if process.returncode != 0:
         raise GitException(process.stderr.decode())
 
 
-def get_description(git_repo: Union[Path, str]) -> str:
+async def get_description(git_repo: Union[Path, str]) -> Coroutine[Any, Any, str]:
     """
     Gets the set description for a repo
 
@@ -106,22 +109,22 @@ def get_description(git_repo: Union[Path, str]) -> str:
         :return: The description
     """
     git_repo = ensure_path(git_repo)
-    with open(git_repo / "description", "r") as fo:
-        return fo.read()
+    async with aiofiles.open(git_repo / "description", "r") as fo:
+        return await fo.read()
 
 
-def set_description(git_repo: Union[Path, str], description: str):
+async def set_description(git_repo: Union[Path, str], description: str):
     """
     Sets the set description for a repo
 
         :param git_repo: Path to the repo
     """
     git_repo = ensure_path(git_repo)
-    with open(git_repo / "description", "w") as fo:
-        fo.write(description)
+    async with aiofiles.open(git_repo / "description", "w") as fo:
+        await fo.write(description)
 
 
-def run_maintenance(git_repo: Union[Path, str]):
+async def run_maintenance(git_repo: Union[Path, str]):
     """
     Run a maintenance git command to specified repo
 
@@ -129,12 +132,12 @@ def run_maintenance(git_repo: Union[Path, str]):
         :raises GitException: Error to do with git
     """
     args = ["git", "-C", str(git_repo), "maintenance", "run"]
-    process = subprocess.run(args, capture_output=True)
+    process = await subprocess_run(args)
     if process.returncode != 0:
         raise GitException(process.stderr.decode())
 
 
-def get_archive(
+async def get_archive(
         git_repo: Union[Path, str],
         archive_type: ArchiveTypes,
         tree_ish: str = "HEAD") -> bytes:
@@ -150,26 +153,24 @@ def get_archive(
     # this allows for strings to be passed
     if isinstance(archive_type, ArchiveTypes):
         archive_type = archive_type.value
-    process = subprocess.run(
+    process = await subprocess_run(
         ["git", "-C", str(git_repo), "archive", f"--format={archive_type}", tree_ish],
-        capture_output=True)
+    )
     if process.returncode != 0:
         raise GitException(process.stderr.decode())
     return process.stdout
 
 
-def get_archive_buffered(
+async def get_archive_buffered(
         git_repo: Union[Path, str],
         archive_type: ArchiveTypes,
-        tree_ish: str = "HEAD",
-        bufsize: int = -1) -> Generator[bytes, None, None]:
+        tree_ish: str = "HEAD") -> AsyncGenerator[bytes, None]:
     """
     get a archive of a git repo, but using a buffered read
 
         :param git_repo: Where the repo is
         :param archive_type: What archive type will be created
         :param tree_ish: What commit/branch to save, defaults to "HEAD"
-        :param bufsize: The buffer size to pass into subprocess.Popen, defaults to -1
         :raises GitException: Error to do with git
         :yield: Each read content section
     """
@@ -177,16 +178,10 @@ def get_archive_buffered(
     if isinstance(archive_type, ArchiveTypes):
         archive_type = archive_type.value
 
-    with subprocess.Popen(
-        ["git", "-C", str(git_repo), "archive", f"--format={archive_type}", tree_ish],
-        bufsize=bufsize,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    ) as process:
-        for line in process.stdout:
-            yield line
+    args = ["git", "-C", str(git_repo), "archive", f"--format={archive_type}", tree_ish]
 
-        return_code = process.wait()
-        if return_code != 0:
-            stderr = process.stderr.read().decode()
-            raise GitException(stderr)
+    try:
+        async for content in subprocess_run_buffered(args):
+            yield content
+    except BufferedProcessError as err:
+        raise GitException(err.args[0].decode()) from err
