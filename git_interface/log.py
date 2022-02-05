@@ -2,16 +2,16 @@
 Methods for using the 'log' command
 """
 import re
-import subprocess
-from collections.abc import Iterator
+from collections.abc import Coroutine, Iterator
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from .constants import EMPTY_REPO_RE, UNKNOWN_REV_RE
 from .datatypes import Log
 from .exceptions import (GitException, NoCommitsException, NoLogsException,
                          UnknownRevisionException)
+from .helpers import subprocess_run
 
 __all__ = ["get_logs"]
 
@@ -35,12 +35,12 @@ def __process_logs(stdout: str) -> Iterator[Log]:
     return map(__process_log, log_lines)
 
 
-def get_logs(
+async def get_logs(
         git_repo: Path,
         branch: Optional[str] = None,
         max_number: Optional[int] = None,
         since: Optional[datetime] = None,
-        until: Optional[datetime] = None) -> Iterator[Log]:
+        until: Optional[datetime] = None) -> Coroutine[Any, Any, Iterator[Log]]:
     """
     Generate git logs from a repo
 
@@ -68,9 +68,7 @@ def get_logs(
     # formats: https://git-scm.com/docs/pretty-formats
     args.append("--pretty=%H;;%P;;%ae;;%an;;%cI;;%s")
 
-    process_status = subprocess.run(
-        args,
-        capture_output=True)
+    process_status = await subprocess_run(args)
     if not process_status.stdout:
         stderr = process_status.stderr.decode()
         if re.match(EMPTY_REPO_RE, stderr):

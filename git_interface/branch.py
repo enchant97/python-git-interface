@@ -2,15 +2,15 @@
 Methods for using the 'branch' command
 """
 import re
-import subprocess
 from pathlib import Path
-from typing import Union
+from typing import Union, Any
 
 from .constants import (BRANCH_ALREADY_EXISTS_RE, BRANCH_NOT_FOUND_RE,
                         BRANCH_REFNAME_NOT_FOUND_RE)
 from .exceptions import (AlreadyExistsException, GitException,
                          NoBranchesException)
-from .helpers import ensure_path
+from .helpers import ensure_path, subprocess_run
+from collections.abc import Coroutine
 
 __all__ = [
     "get_branches", "new_branch",
@@ -19,7 +19,7 @@ __all__ = [
 ]
 
 
-def get_branches(git_repo: Union[Path, str]) -> tuple[str, tuple[str]]:
+async def get_branches(git_repo: Union[Path, str]) -> Coroutine[Any, Any, tuple[str, tuple[str]]]:
     """
     Get the head branch and all others
 
@@ -34,7 +34,7 @@ def get_branches(git_repo: Union[Path, str]) -> tuple[str, tuple[str]]:
 
     args = ["git", "-C", str(git_repo), "branch", "--no-color"]
 
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
     if not process_status.stdout:
         stderr = process_status.stderr.decode()
         if process_status.returncode != 0:
@@ -54,7 +54,7 @@ def get_branches(git_repo: Union[Path, str]) -> tuple[str, tuple[str]]:
     return head, tuple(other_branches)
 
 
-def new_branch(git_repo: Union[Path, str], branch_name: str):
+async def new_branch(git_repo: Union[Path, str], branch_name: str):
     """
     Create a new branch in repo
 
@@ -64,7 +64,7 @@ def new_branch(git_repo: Union[Path, str], branch_name: str):
         :raises GitException: Error to do with git
     """
     args = ["git", "-C", str(git_repo), "branch", branch_name]
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
     if process_status.returncode != 0:
         stderr = process_status.stderr.decode()
         if re.match(BRANCH_ALREADY_EXISTS_RE, stderr):
@@ -73,7 +73,7 @@ def new_branch(git_repo: Union[Path, str], branch_name: str):
         raise GitException(stderr)
 
 
-def copy_branch(git_repo: Union[Path, str], branch_name: str, new_branch: str):
+async def copy_branch(git_repo: Union[Path, str], branch_name: str, new_branch: str):
     """
     Copy an existing branch to a new branch in repo (uses --force)
 
@@ -85,7 +85,7 @@ def copy_branch(git_repo: Union[Path, str], branch_name: str, new_branch: str):
     """
     args = ["git", "-C", str(git_repo), "branch", "-C",
             branch_name, new_branch]
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
     if process_status.returncode != 0:
         stderr = process_status.stderr.decode()
         if re.match(BRANCH_REFNAME_NOT_FOUND_RE, stderr):
@@ -94,7 +94,7 @@ def copy_branch(git_repo: Union[Path, str], branch_name: str, new_branch: str):
         raise GitException(stderr)
 
 
-def rename_branch(git_repo: Union[Path, str], branch_name: str, new_branch: str):
+async def rename_branch(git_repo: Union[Path, str], branch_name: str, new_branch: str):
     """
     Rename an existing branch (uses --force)
 
@@ -106,7 +106,7 @@ def rename_branch(git_repo: Union[Path, str], branch_name: str, new_branch: str)
     """
     args = ["git", "-C", str(git_repo), "branch", "-M",
             branch_name, new_branch]
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
     if process_status.returncode != 0:
         stderr = process_status.stderr.decode()
         if re.match(BRANCH_REFNAME_NOT_FOUND_RE, stderr):
@@ -115,7 +115,7 @@ def rename_branch(git_repo: Union[Path, str], branch_name: str, new_branch: str)
         raise GitException(stderr)
 
 
-def delete_branch(git_repo: Union[Path, str], branch_name: str):
+async def delete_branch(git_repo: Union[Path, str], branch_name: str):
     """
     Delete an existing branch (uses --force)
 
@@ -125,7 +125,7 @@ def delete_branch(git_repo: Union[Path, str], branch_name: str):
         :raises GitException: Error to do with git
     """
     args = ["git", "-C", str(git_repo), "branch", "-D", branch_name]
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
     if process_status.returncode != 0:
         stderr = process_status.stderr.decode()
         if re.match(BRANCH_NOT_FOUND_RE, stderr):

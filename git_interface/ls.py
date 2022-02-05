@@ -2,14 +2,14 @@
 Methods for using the 'ls-tree' command
 """
 import re
-import subprocess
-from collections.abc import Iterator
+from collections.abc import Coroutine, Iterator
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from .constants import LS_TREE_LONG_RE, LS_TREE_RE, NOT_VALID_OBJECT_NAME_RE
 from .datatypes import TreeContent
 from .exceptions import GitException, UnknownRevisionException
+from .helpers import subprocess_run
 
 __all__ = ["ls_tree"]
 
@@ -43,12 +43,12 @@ def __ls_tree_process_line_long(line: str) -> TreeContent:
     )
 
 
-def ls_tree(
+async def ls_tree(
         git_repo: Union[Path, str],
         tree_ish: str,
         recursive: bool,
         use_long: bool,
-        path: Optional[Path] = None) -> Iterator[TreeContent]:
+        path: Optional[Path] = None) -> Coroutine[Any, Any, Iterator[TreeContent]]:
     """
     Get the tree of objects in repo
 
@@ -71,7 +71,7 @@ def ls_tree(
     if path is not None:
         args.append(str(path))
 
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
     if not process_status.stdout and process_status.returncode != 0:
         stderr = process_status.stderr.decode()
         if re.match(NOT_VALID_OBJECT_NAME_RE, stderr):

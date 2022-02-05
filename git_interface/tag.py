@@ -2,13 +2,14 @@
 Methods for using the 'tag' command
 """
 import re
-import subprocess
+from collections.abc import Coroutine
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from .constants import TAG_ALREADY_EXISTS_RE, TAG_NOT_FOUND_RE
 from .exceptions import (AlreadyExistsException, DoesNotExistException,
                          GitException)
+from .helpers import subprocess_run
 
 __all__ = [
     "list_tags", "create_tag",
@@ -16,7 +17,9 @@ __all__ = [
 ]
 
 
-def list_tags(git_repo: Union[Path, str], tag_pattern: Optional[str] = None) -> list[str]:
+async def list_tags(
+        git_repo: Union[Path, str],
+        tag_pattern: Optional[str] = None) -> Coroutine[Any, Any, list[str]]:
     """
     List all git tags or filter with a wildcard pattern
 
@@ -29,7 +32,7 @@ def list_tags(git_repo: Union[Path, str], tag_pattern: Optional[str] = None) -> 
     if tag_pattern:
         args.append(tag_pattern)
 
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
 
     if process_status.returncode != 0:
         stderr = process_status.stderr.decode()
@@ -38,7 +41,10 @@ def list_tags(git_repo: Union[Path, str], tag_pattern: Optional[str] = None) -> 
     return process_status.stdout.decode().strip().split("\n")
 
 
-def create_tag(git_repo: Union[Path, str], tag_name: str, commit_hash: Optional[str] = None):
+async def create_tag(
+        git_repo: Union[Path, str],
+        tag_name: str,
+        commit_hash: Optional[str] = None):
     """
     Create a new lightweight tag
 
@@ -53,7 +59,7 @@ def create_tag(git_repo: Union[Path, str], tag_name: str, commit_hash: Optional[
     if commit_hash:
         args.append(commit_hash)
 
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
 
     if process_status.returncode != 0:
         stderr = process_status.stderr.decode()
@@ -62,7 +68,9 @@ def create_tag(git_repo: Union[Path, str], tag_name: str, commit_hash: Optional[
         raise GitException(stderr)
 
 
-def delete_tag(git_repo: Union[Path, str], tag_name: str) -> str:
+async def delete_tag(
+        git_repo: Union[Path, str],
+        tag_name: str) -> Coroutine[Any, Any, str]:
     """
     Delete a tag
 
@@ -74,7 +82,7 @@ def delete_tag(git_repo: Union[Path, str], tag_name: str) -> str:
     """
     args = ["git", "-C", str(git_repo), "tag", "-d", tag_name]
 
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
 
     if process_status.returncode != 0:
         stderr = process_status.stderr.decode()

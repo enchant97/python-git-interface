@@ -2,12 +2,13 @@
 Methods for using the 'rev-list' command
 """
 import re
-import subprocess
+from collections.abc import Coroutine
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from .constants import UNKNOWN_REV_RE
 from .exceptions import GitException, UnknownRevisionException
+from .helpers import subprocess_run
 
 __all__ = [
     "get_commit_count", "get_disk_usage",
@@ -15,16 +16,16 @@ __all__ = [
 ]
 
 
-def _rev_list(
+async def _rev_list(
         git_repo: Union[Path, str],
         branch: Optional[str] = None,
-        operator: Optional[str] = None) -> str:
+        operator: Optional[str] = None) -> Coroutine[Any, Any, str]:
     if branch is None:
         branch = "--all"
     args = ["git", "-C", str(git_repo), "rev-list", branch]
     if operator:
         args.append(operator)
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
 
     if process_status.returncode != 0:
         stderr = process_status.stderr.decode()
@@ -34,7 +35,9 @@ def _rev_list(
     return process_status.stdout.decode()
 
 
-def get_commit_count(git_repo: Union[Path, str], branch: Optional[str] = None) -> int:
+async def get_commit_count(
+        git_repo: Union[Path, str],
+        branch: Optional[str] = None) -> Coroutine[Any, Any, int]:
     """
     Get a repos commit count
 
@@ -44,10 +47,12 @@ def get_commit_count(git_repo: Union[Path, str], branch: Optional[str] = None) -
         :raises GitException: Error to do with git
         :return: The commit count
     """
-    return int(_rev_list(git_repo, branch, "--count"))
+    return int(await _rev_list(git_repo, branch, "--count"))
 
 
-def get_disk_usage(git_repo: Union[Path, str], branch: Optional[str] = None) -> int:
+async def get_disk_usage(
+        git_repo: Union[Path, str],
+        branch: Optional[str] = None) -> Coroutine[Any, Any, int]:
     """
     Get a size of the repo
 
@@ -57,10 +62,12 @@ def get_disk_usage(git_repo: Union[Path, str], branch: Optional[str] = None) -> 
         :raises GitException: Error to do with git
         :return: The size of the repo
     """
-    return int(_rev_list(git_repo, branch, "--disk-usage"))
+    return int(await _rev_list(git_repo, branch, "--disk-usage"))
 
 
-def get_rev_list(git_repo: Union[Path, str], branch: Optional[str] = None) -> list[str]:
+async def get_rev_list(
+        git_repo: Union[Path, str],
+        branch: Optional[str] = None) -> Coroutine[Any, Any, list[str]]:
     """
     Get a repos revisions
 
@@ -70,4 +77,4 @@ def get_rev_list(git_repo: Union[Path, str], branch: Optional[str] = None) -> li
         :raises GitException: Error to do with git
         :return: The repos revisions
     """
-    return _rev_list(git_repo, branch).strip().split("\n")
+    return (await _rev_list(git_repo, branch)).strip().split("\n")

@@ -1,11 +1,13 @@
 """
 Methods for using git symbolic-ref command
 """
-import subprocess
+from collections.abc import Coroutine
 from pathlib import Path
-from typing import Union
+from subprocess import CompletedProcess
+from typing import Any, Union
 
 from .exceptions import GitException, UnknownRefException
+from .helpers import subprocess_run
 
 __all__ = [
     "change_symbolic_ref", "get_symbolic_ref",
@@ -14,7 +16,7 @@ __all__ = [
 ]
 
 
-def _raise_known_errors(process_status: subprocess.CompletedProcess, ref: str):
+def _raise_known_errors(process_status: CompletedProcess, ref: str):
     """
     Used to raise any known git
     exceptions for the 'symbolic-ref' command
@@ -30,7 +32,7 @@ def _raise_known_errors(process_status: subprocess.CompletedProcess, ref: str):
         raise GitException(process_status.stderr.decode())
 
 
-def change_symbolic_ref(git_repo: Union[Path, str], name: str, ref: str):
+async def change_symbolic_ref(git_repo: Union[Path, str], name: str, ref: str):
     """
     Change a symbolic ref in repo
 
@@ -41,11 +43,11 @@ def change_symbolic_ref(git_repo: Union[Path, str], name: str, ref: str):
         :raises GitException: Error to do with git
     """
     args = ["git", "-C", str(git_repo), "symbolic-ref", name, ref]
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
     _raise_known_errors(process_status, ref)
 
 
-def get_symbolic_ref(git_repo: Union[Path, str], name: str) -> str:
+async def get_symbolic_ref(git_repo: Union[Path, str], name: str) -> Coroutine[Any, Any, str]:
     """
     Get a symbolic ref in repo
 
@@ -55,12 +57,12 @@ def get_symbolic_ref(git_repo: Union[Path, str], name: str) -> str:
         :raises GitException: Error to do with git
     """
     args = ["git", "-C", str(git_repo), "symbolic-ref", name]
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
     _raise_known_errors(process_status, name)
     return process_status.stdout.decode().strip()
 
 
-def delete_symbolic_ref(git_repo: Union[Path, str], name: str):
+async def delete_symbolic_ref(git_repo: Union[Path, str], name: str):
     """
     Delete a symbolic ref in repo
 
@@ -70,11 +72,11 @@ def delete_symbolic_ref(git_repo: Union[Path, str], name: str):
         :raises GitException: Error to do with git
     """
     args = ["git", "-C", str(git_repo), "symbolic-ref", "-d", name]
-    process_status = subprocess.run(args, capture_output=True)
+    process_status = await subprocess_run(args)
     _raise_known_errors(process_status, name)
 
 
-def get_active_branch(git_repo: Union[Path, str]) -> str:
+async def get_active_branch(git_repo: Union[Path, str]) -> Coroutine[Any, Any, str]:
     """
     Get the active (HEAD) reference
 
@@ -82,10 +84,10 @@ def get_active_branch(git_repo: Union[Path, str]) -> str:
         :raises UnknownRefException: Unknown reference given
         :raises GitException: Error to do with git
     """
-    return get_symbolic_ref(git_repo, "HEAD")
+    return await get_symbolic_ref(git_repo, "HEAD")
 
 
-def change_active_branch(git_repo: Union[Path, str], branch: str):
+async def change_active_branch(git_repo: Union[Path, str], branch: str):
     """
     Change the active (HEAD) reference
 
@@ -94,4 +96,4 @@ def change_active_branch(git_repo: Union[Path, str], branch: str):
         :raises UnknownRefException: Unknown reference given
         :raises GitException: Error to do with git
     """
-    change_symbolic_ref(git_repo, "HEAD", f"refs/heads/{branch}")
+    await change_symbolic_ref(git_repo, "HEAD", f"refs/heads/{branch}")

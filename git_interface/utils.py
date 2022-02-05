@@ -4,7 +4,7 @@ Methods that don't fit in their own file
 import os
 from collections.abc import Coroutine
 from pathlib import Path
-from typing import Any, AsyncGenerator, Generator, Optional, Union
+from typing import Any, AsyncGenerator, Optional, Union
 
 import aiofiles
 
