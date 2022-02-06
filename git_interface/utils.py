@@ -96,7 +96,7 @@ async def clone_repo(git_repo: Union[Path, str], src: str, bare=False, mirror=Fa
     elif mirror:
         args.append("--mirror")
 
-    process = await subprocess_run(args, capture_output=True, env=env)
+    process = await subprocess_run(args, env=env)
     if process.returncode != 0:
         raise GitException(process.stderr.decode())
 

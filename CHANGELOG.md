@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.1] - 2022-02-06
+### Fixed
+- Fix clone repo function
+
 ## [0.7.0] - 2022-02-06
 This version will break your projects written for previous versions as all functions are now asynchronous. I have changed them to increase speed for my  [basic-git-web-interface](https://github.com/enchant97/basic-git-web-interface) project.
 
@@ -102,6 +106,7 @@ To make your code compatible either switch to using async functions and await th
 - Log viewing
 - Init repo
 
+[0.7.1]: https://github.com/enchant97/python-git-interface/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/enchant97/python-git-interface/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/enchant97/python-git-interface/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/enchant97/python-git-interface/compare/v0.5.1...v0.5.2

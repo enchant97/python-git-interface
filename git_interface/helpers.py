@@ -26,7 +26,7 @@ def ensure_path(path_or_str: Union[Path, str]) -> Path:
     return path_or_str if isinstance(path_or_str, Path) else Path(path_or_str)
 
 
-async def subprocess_run(args: Iterable[str]) -> Coroutine[Any, Any, CompletedProcess]:
+async def subprocess_run(args: Iterable[str], **kwargs) -> Coroutine[Any, Any, CompletedProcess]:
     """
     Asynchronous alternative to using subprocess.run
 
@@ -36,7 +36,8 @@ async def subprocess_run(args: Iterable[str]) -> Coroutine[Any, Any, CompletedPr
     process = await asyncio.create_subprocess_exec(
         args[0], *args[1:],
         stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
+        stderr=asyncio.subprocess.PIPE,
+        **kwargs
     )
     stdout, stderr = await process.communicate()
     return CompletedProcess(args, process.returncode, stdout, stderr)
