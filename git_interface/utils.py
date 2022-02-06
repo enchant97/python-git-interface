@@ -185,3 +185,44 @@ async def get_archive_buffered(
             yield content
     except BufferedProcessError as err:
         raise GitException(err.args[0].decode()) from err
+
+
+async def add_to_staged(git_repo: Union[Path, str], path: str, *extra_paths: tuple[str]):
+    """
+    Add files to the repository staging area
+
+        :param git_repo: Where the repo is
+        :param path: The path to add
+        :param *extra_paths: Add more paths
+        :raises GitException: Error to do with git
+    """
+    args = ["git", "-C", str(git_repo), "add", path]
+    if len(extra_paths) != 0:
+        args.extend(extra_paths)
+
+    process = await subprocess_run(args)
+    if process.returncode != 0:
+        # TODO handle more specific exceptions
+        raise GitException(process.stderr.decode())
+
+
+async def commit_staged(git_repo: Union[Path, str], messages: Union[str, tuple[str]]):
+    """
+    Commit staged files with a message(s)
+
+        :param git_repo: Where the repo is
+        :param messages: A single message or multiple
+        :raises GitException: Error to do with git
+    """
+    args = ["git", "-C", str(git_repo), "commit"]
+
+    if (isinstance(messages, str)):
+        messages = (messages,)
+
+    for content in messages:
+        args.extend(("-m", f"\"{content}\""))
+
+    process = await subprocess_run(args)
+    if process.returncode != 0:
+        # TODO handle more specific exceptions
+        raise GitException(process.stderr.decode())
