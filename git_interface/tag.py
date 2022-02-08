@@ -38,6 +38,9 @@ async def list_tags(
         stderr = process_status.stderr.decode()
         raise GitException(stderr)
 
+    if not process_status.stdout.decode().strip():
+        return list()
+
     return process_status.stdout.decode().strip().split("\n")
 
 
