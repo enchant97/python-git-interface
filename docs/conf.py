@@ -24,7 +24,7 @@ templates_path = ['_templates']
 
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-autodoc_mock_imports = ["quart", "async_timeout"]
+autodoc_mock_imports = ["aiofiles", "quart", "async_timeout"]
 
 autodoc_typehints = "description"
 
