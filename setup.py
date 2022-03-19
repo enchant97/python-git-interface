@@ -6,4 +6,7 @@ setup(
     install_requires=[
         "aiofiles >= 0.8",
     ],
+    extras_require={
+        "quart": ["quart>=0.16.3", "async-timeout>=4.0.2"],
+    },
 )
