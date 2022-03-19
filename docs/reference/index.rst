@@ -4,7 +4,7 @@ Reference
 .. toctree::
    :maxdepth: 2
 
-   smart_http
+   smart_http/index
    branch
    cat_file
    datatypes
