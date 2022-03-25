@@ -61,6 +61,7 @@ async def _pack_handler(
 
     if input_stream is not None:
         async for chunk in input_stream:
+            process.stdin.write(chunk)
             if chunk.endswith(b"done\n"):
                 # allows for ssh style pack exchange
                 break
