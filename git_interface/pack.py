@@ -5,17 +5,15 @@ import asyncio
 from pathlib import Path
 from typing import AsyncGenerator, Union
 
+from .constants import ALLOWED_PACK_TYPES, RECEIVE_PACK_TYPE, UPLOAD_PACK_TYPE
 from .exceptions import BufferedProcessError
+from .shared import logger
 
 __all__ = [
     "UPLOAD_PACK_TYPE", "RECEIVE_PACK_TYPE",
     "ALLOWED_PACK_TYPES", "exchange_pack",
     "advertise_pack",
 ]
-
-UPLOAD_PACK_TYPE = "git-upload-pack"
-RECEIVE_PACK_TYPE = "git-receive-pack"
-ALLOWED_PACK_TYPES = (UPLOAD_PACK_TYPE, RECEIVE_PACK_TYPE)
 
 
 def _create_advertisement(pack_type) -> bytes:
@@ -103,3 +101,30 @@ def advertise_pack(
     :return: The buffered output stream as a AsyncGenerator
     """
     return _pack_handler(git_repo, pack_type)
+
+
+async def ssh_pack_exchange(
+        git_repo: Union[str, Path],
+        pack_type: str,
+        stdin: AsyncGenerator[bytes]) -> AsyncGenerator[bytes, None]:
+    """
+    Used to handle git pack exchange for a ssh connection.
+
+        :param git_repo: Path to the repo
+        :param pack_type: The pack-type ('git-upload-pack' or 'git-receive-pack')
+        :param stdin: Input to feed from client
+        :yield: Output to send to client
+    """
+    advert_stdout = advertise_pack(git_repo, pack_type)
+    # skips http 'advertisement' provided by _pack_handler
+    await advert_stdout.__anext__()
+
+    async for chunk in advert_stdout:
+        yield chunk
+
+    logger.debug("git advert done for: %s", git_repo)
+
+    async for chunk in exchange_pack(git_repo, pack_type, stdin):
+        yield chunk
+
+    logger.debug("git pack exchange done for: %s", git_repo)

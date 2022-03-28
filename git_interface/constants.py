@@ -15,3 +15,9 @@ TAG_NOT_FOUND_RE = r"error: tag '.+' not found"
 LS_TREE_RE = r"^(\d{6}) (\w+) (\w{40})\t(.+)$"
 # git ls-tree <tree-ish> -l
 LS_TREE_LONG_RE = r"^(\d{6}) (\w+) (\w{40}) +(\d+|\-)\t(.+)$"
+
+# constants for valid pack-types
+UPLOAD_PACK_TYPE = "git-upload-pack"
+RECEIVE_PACK_TYPE = "git-receive-pack"
+ALLOWED_PACK_TYPES = (UPLOAD_PACK_TYPE, RECEIVE_PACK_TYPE)
+VALID_SSH_COMMAND_RE = f"^({UPLOAD_PACK_TYPE}|{RECEIVE_PACK_TYPE}) '(.+)'$"
