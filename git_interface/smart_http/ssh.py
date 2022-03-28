@@ -2,8 +2,9 @@ import asyncio
 import re
 import sys
 from os import environ
-from typing import Optional
 from pathlib import Path
+from typing import Optional, Union
+
 import asyncssh
 
 from ..constants import VALID_SSH_COMMAND_RE
@@ -42,6 +43,7 @@ class Server:
     that can inherited to adjust functionality
     """
     _no_command_msg = b"Successfully authenticated, but this server does not provide shell access"
+    _no_repo_msg = b"request path does not exist, or you do not have access"
 
     def __init__(
             self,
@@ -50,8 +52,63 @@ class Server:
         self._root_repo_path = root_repo_path
         self._handler_class = handler_class
 
+    def ensure_valid_repo(self, requested_repo: str, username: str) -> Union[Path, None]:
+        """
+        Used to ensure a given path is a valid repo,
+        username currently not used but this method
+        could be overridden to implement custom functionality
+
+            :param requested_repo: The requested repo path (relative)
+            :param username: The username for the connected client
+            :return: The absolute repo path, or None if path was invalid
+        """
+        repo_path: Path = self._root_repo_path / requested_repo.removeprefix("/")
+        if repo_path.exists():
+            return repo_path
+
+    def peer_allowed(peername: str) -> bool:
+        """
+        Blueprint method used to validate
+        whether a peername is allowed to use ssh,
+
+            :param peername: The peername
+            :return: Whether peername is allowed
+        """
+        return True
+
+    def username_valid(username: str) -> bool:
+        """
+        Blueprint method used to validate
+        whether a username is valid,
+
+            :param username: The username
+            :return: Whether username is valid
+        """
+        return True
+
     async def handle_client(self, process: asyncssh.SSHServerProcess):
-        logger.debug("handling client: %s", process.get_extra_info('username'))
+        """
+        Method used when client has been authenticated,
+        provides git pack exchange,
+        validation provided by:
+        ensure_valid_repo, peer_allowed and username_valid
+
+            :param process: The SSHServerProcess
+        """
+        peer_name = process.get_extra_info('peername')[0]
+        username = process.get_extra_info('username')
+
+        if not self.peer_allowed(peer_name):
+            logger.error("client with peername: '%s' was denied", peer_name)
+            process.exit(0)
+            return
+
+        if not self.username_valid(username):
+            logger.debug("username: '%s' was invalid, received from '%s'", username, peer_name)
+            process.exit(0)
+            return
+
+        logger.debug("handling client: %s at %s", username, peer_name)
 
         if process.command is None:
             process.stdout.write(self._no_command_msg)
@@ -60,11 +117,20 @@ class Server:
 
         if match := re.match(VALID_SSH_COMMAND_RE, process.command):
             pack_type = match.group(1)
-            repo_path = self._root_repo_path / match.group(2).removeprefix("/")
             logger.debug(
                 "pack_type: '%s' received from '%s'",
-                pack_type, process.get_extra_info('peername')[0]
+                pack_type, peer_name
             )
+
+            repo_path = match.group(2)
+            logger.debug("repo path: '%s' received from '%s'", repo_path, peer_name)
+            repo_path = self.ensure_valid_repo(repo_path, username)
+
+            if not repo_path:
+                logger.debug("invalid repo path: '%s' received from '%s'", repo_path, peer_name)
+                process.stdout.write(self._no_repo_msg)
+                process.exit(0)
+                return
 
             async for chunk in ssh_pack_exchange(repo_path, pack_type, process.stdin):
                 process.stdout.write(chunk)
