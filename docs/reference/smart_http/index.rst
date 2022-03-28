@@ -5,3 +5,4 @@ git\_interface.smart_http
    :maxdepth: 2
 
    quart
+   ssh
