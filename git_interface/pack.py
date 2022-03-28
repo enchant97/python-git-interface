@@ -106,7 +106,7 @@ def advertise_pack(
 async def ssh_pack_exchange(
         git_repo: Union[str, Path],
         pack_type: str,
-        stdin: AsyncGenerator[bytes]) -> AsyncGenerator[bytes, None]:
+        stdin: AsyncGenerator[bytes, None]) -> AsyncGenerator[bytes, None]:
     """
     Used to handle git pack exchange for a ssh connection.
 
