@@ -13,9 +13,9 @@ from .helpers import ensure_path, subprocess_run
 from collections.abc import Coroutine
 
 __all__ = [
-    "get_branches", "new_branch",
-    "copy_branch", "rename_branch",
-    "delete_branch",
+    "get_branches", "count_branches",
+    "new_branch", "copy_branch",
+    "rename_branch", "delete_branch",
 ]
 
 
@@ -52,6 +52,28 @@ async def get_branches(git_repo: Union[Path, str]) -> Coroutine[Any, Any, tuple[
             other_branches.append(line.strip())
 
     return head, tuple(other_branches)
+
+
+async def count_branches(git_repo: Path) -> Coroutine[Any, Any, int]:
+    """
+    Count how many branches are in repo,
+    returned value will be at >=0
+
+        :param git_repo: Path to the repo
+        :raises GitException: Error to do with git
+        :return: Number of branches found
+    """
+    args = ["git", "-C", str(git_repo), "branch", "--no-color"]
+
+    process_status = await subprocess_run(args)
+    if not process_status.stdout:
+        stderr = process_status.stderr.decode()
+        if process_status.returncode != 0:
+            raise GitException(stderr)
+        if not stderr:
+            return 0
+
+    return len(process_status.stdout.decode().strip().split("\n"))
 
 
 async def new_branch(git_repo: Union[Path, str], branch_name: str):
