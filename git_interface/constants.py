@@ -1,7 +1,7 @@
 """
 Constants
 """
-from io import DEFAULT_BUFFER_SIZE
+import io
 
 DEFAULT_BUFFER_SIZE = io.DEFAULT_BUFFER_SIZE
 
