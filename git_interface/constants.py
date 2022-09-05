@@ -1,6 +1,10 @@
 """
 Constants
 """
+from io import DEFAULT_BUFFER_SIZE
+
+DEFAULT_BUFFER_SIZE = io.DEFAULT_BUFFER_SIZE
+
 EMPTY_REPO_RE = r"fatal: your current branch '.+' does not have any commits yet"
 UNKNOWN_REV_RE = r"fatal: ambiguous argument '.+': unknown revision or path not in the working tree."
 BRANCH_ALREADY_EXISTS_RE = r"fatal: A branch named '.+' already exists."

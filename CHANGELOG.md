@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.9.1 - 2022-09-05
+### Fixed
+- When reading large repo objects, using the stream functions, the max buffer size would be hit. Now reads in chunks, the size of which will vary depending on the constant set by `io.DEFAULT_BUFFER_SIZE`
 
 ## [0.9.0] - 2022-09-04
 ### Added
@@ -131,6 +134,7 @@ To make your code compatible either switch to using async functions and await th
 - Log viewing
 - Init repo
 
+[0.9.1]: https://github.com/enchant97/python-git-interface/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/enchant97/python-git-interface/compare/v0.8.2...v0.9.0
 [0.8.2]: https://github.com/enchant97/python-git-interface/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/enchant97/python-git-interface/compare/v0.8.0...v0.8.1

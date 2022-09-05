@@ -8,6 +8,7 @@ from pathlib import Path
 from subprocess import CompletedProcess
 from typing import Any, Union
 
+from .constants import DEFAULT_BUFFER_SIZE
 from .exceptions import BufferedProcessError
 
 __all__ = [
@@ -24,6 +25,18 @@ def ensure_path(path_or_str: Union[Path, str]) -> Path:
         :return: The value as a pathlib.Path obj
     """
     return path_or_str if isinstance(path_or_str, Path) else Path(path_or_str)
+
+
+async def chunk_yielder(input_stream: asyncio.StreamReader) -> AsyncGenerator[bytes, None]:
+    """
+    reads from a stream chunk by chunk until EOF.
+    Uses DEFAULT_BUFFER_SIZE to determine max chunk size
+
+        :param input_stream: The stream to read
+        :yield: Each chunk
+    """
+    while (chunk := await input_stream.read(DEFAULT_BUFFER_SIZE)) != b"":
+        yield chunk
 
 
 async def subprocess_run(args: Iterable[str], **kwargs) -> Coroutine[Any, Any, CompletedProcess]:
@@ -56,8 +69,8 @@ async def subprocess_run_buffered(args: Iterable[str]) -> AsyncGenerator[bytes, 
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    async for line in process.stdout:
-        yield line
+    async for chunk in chunk_yielder(process.stdout):
+        yield chunk
 
     return_code = await process.wait()
     if return_code != 0:

@@ -7,6 +7,7 @@ from typing import AsyncGenerator, Union
 
 from .constants import ALLOWED_PACK_TYPES, RECEIVE_PACK_TYPE, UPLOAD_PACK_TYPE
 from .exceptions import BufferedProcessError
+from .helpers import chunk_yielder
 from .shared import logger
 
 __all__ = [
@@ -67,7 +68,7 @@ async def _pack_handler(
     else:
         yield _create_advertisement(pack_type)
 
-    async for chunk in process.stdout:
+    async for chunk in chunk_yielder(process.stdout):
         yield chunk
 
     return_code = await process.wait()
