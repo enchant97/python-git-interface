@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.3] - 2022-11-14
+### Changed
+- Update deps for docs
+### Fixed
+- Add missing doc stuff
+
 ## [0.9.2] - 2022-09-05
 ### Fixed
 - When reading large repo objects, using the stream functions, the max buffer size would be hit. Now reads in chunks, the size of which will vary depending on the constant set by `io.DEFAULT_BUFFER_SIZE`
