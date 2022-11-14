@@ -13,7 +13,7 @@ from .shared import logger
 __all__ = [
     "UPLOAD_PACK_TYPE", "RECEIVE_PACK_TYPE",
     "ALLOWED_PACK_TYPES", "exchange_pack",
-    "advertise_pack",
+    "advertise_pack", "ssh_pack_exchange",
 ]
 
 

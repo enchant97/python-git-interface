@@ -10,6 +10,7 @@ Reference
    cat_file
    datatypes
    exceptions
+   helpers
    log
    ls
    pack

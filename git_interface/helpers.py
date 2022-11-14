@@ -12,8 +12,8 @@ from .constants import DEFAULT_BUFFER_SIZE
 from .exceptions import BufferedProcessError
 
 __all__ = [
-    "ensure_path", "subprocess_run",
-    "subprocess_run_buffered",
+    "ensure_path", "chunk_yielder",
+    "subprocess_run", "subprocess_run_buffered",
 ]
 
 

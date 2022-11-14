@@ -15,6 +15,7 @@ __all__ = [
     "get_version", "init_repo",
     "clone_repo", "get_description",
     "set_description", "run_maintenance",
+    "add_to_staged", "commit_staged",
 ]
 
 
