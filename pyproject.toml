@@ -52,6 +52,7 @@ dependencies = [
 
 [tool.hatch.envs.tests.scripts]
 unit = "pytest"
+linting = "hatch fmt --check --linter"
 
 [tool.hatch.envs.docs]
 dependencies = [
@@ -72,3 +73,9 @@ packages = [ "git_interface" ]
 line-length=100
 src = [ "paste_bin", "tests" ]
 extend-exclude = [ "tests", "docs" ]
+ignore = [
+    "TID252",
+    "EM101",
+    "TRY003",
+    "E501",
+]
