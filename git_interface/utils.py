@@ -67,7 +67,9 @@ async def init_repo(
         raise GitException(process.stderr.decode())
 
 
-async def clone_repo(git_repo: Path | str, src: str, bare=False, mirror=False):
+async def clone_repo(
+    git_repo: Path | str, src: str, bare=False, mirror=False, depth: None | int = None
+):
     """
     Clone an exiting repo, please note this
     method has no way of passing passwords+usernames
@@ -76,6 +78,7 @@ async def clone_repo(git_repo: Path | str, src: str, bare=False, mirror=False):
         :param src: Where to clone from
         :param bare: Use --bare git argument, defaults to False
         :param mirror: Use --mirror git argument, defaults to False
+        :param depth: Use --depth git argument, defaults to None
         :raises ValueError: Both bare and mirror are True
         :raises GitException: Error to do with git
     """
@@ -88,8 +91,11 @@ async def clone_repo(git_repo: Path | str, src: str, bare=False, mirror=False):
         raise ValueError("both bare and mirror cannot be used at same time")
     if bare:
         args.append("--bare")
-    elif mirror:
+    if mirror:
         args.append("--mirror")
+    if depth:
+        args.append("--depth")
+        args.append(f"{depth}")
 
     process = await subprocess_run(args, env=env)
     if process.returncode != 0:
