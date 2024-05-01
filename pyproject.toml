@@ -1,3 +1,74 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "git-interface"
+dynamic = [ "version" ]
+description = "Use the git cli from Python"
+keywords = [ "git", "scm" ]
+authors = [
+    { name =  "Leo Spratt", email = "contact@enchantedcode.co.uk" },
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Version Control :: Git",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: AsyncIO",
+]
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = [
+    "aiofiles >= 0.8",
+]
+
+[project.optional-dependencies]
+quart = [
+    "quart>=0.16.3",
+    "async-timeout>=4.0.2",
+]
+ssh = [
+    "asyncssh>=2.9.0",
+]
+
+[project.urls]
+"Source Code" = "https://github.com/enchant97/python-git-interface"
+"Change Log" = "https://github.com/enchant97/python-git-interface/blob/main/CHANGELOG.md"
+Documentation = "https://python-git-interface.docs.enchantedcode.co.uk/"
+
+[tool.hatch.envs.tests]
+dependencies = [
+    "pytest~=8.2.0",
+    "pytest-asyncio~=0.23.6",
+]
+
+[tool.hatch.envs.tests.scripts]
+unit = "pytest"
+
+[tool.hatch.envs.docs]
+dependencies = [
+    "sphinx~=7.3.7",
+    "sphinx-rtd-theme~=2.0.0",
+]
+
+[tool.hatch.envs.docs.scripts]
+build = "sphinx-build -M html ./docs ./docs/_build"
+
+[tool.hatch.version]
+path = "git_interface/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = [ "git_interface" ]
+
+[tool.ruff]
+line-length=100
+src = [ "paste_bin", "tests" ]
+extend-exclude = [ "tests", "docs" ]
