@@ -18,12 +18,10 @@ jobs:
         python-version: '3.x'
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install build
-    - name: Build package
-      run: python -m build
-    - name: Publish package
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
+        pip install hatch
+    - name: Build Package
+      run: hatch -v build
+    - name: Publish Package To PyPI
+      run: hatch publish --user __token__
+      env:
+        HATCH_INDEX_AUTH: ${{ secrets.PYPI_API_TOKEN }}
