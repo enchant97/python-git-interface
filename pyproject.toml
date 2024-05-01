@@ -27,7 +27,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 dependencies = [
-    "aiofiles >= 0.8",
+    "aiofiles >= 23.2.1",
 ]
 
 [project.optional-dependencies]
