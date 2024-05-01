@@ -2,10 +2,9 @@
 Methods for using the 'log' command
 """
 import re
-from collections.abc import Coroutine, Iterator
+from collections.abc import Iterator
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 from .constants import EMPTY_REPO_RE, UNKNOWN_REV_RE
 from .datatypes import Log
@@ -45,7 +44,7 @@ async def get_logs(
     max_number: int | None = None,
     since: datetime | None = None,
     until: datetime | None = None,
-) -> Coroutine[Any, Any, Iterator[Log]]:
+) -> Iterator[Log]:
     """
     Generate git logs from a repo
 

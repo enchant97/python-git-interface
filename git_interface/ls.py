@@ -2,9 +2,8 @@
 Methods for using the 'ls-tree' command
 """
 import re
-from collections.abc import Coroutine, Iterator
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any
 
 from .constants import LS_TREE_LONG_RE, LS_TREE_RE, NOT_VALID_OBJECT_NAME_RE
 from .datatypes import TreeContent
@@ -45,7 +44,7 @@ def __ls_tree_process_line_long(line: str) -> TreeContent:
 
 async def ls_tree(
     git_repo: Path | str, tree_ish: str, recursive: bool, use_long: bool, path: Path | None = None
-) -> Coroutine[Any, Any, Iterator[TreeContent]]:
+) -> Iterator[TreeContent]:
     """
     Get the tree of objects in repo
 

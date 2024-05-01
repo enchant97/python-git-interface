@@ -2,9 +2,7 @@
 Methods for using the 'tag' command
 """
 import re
-from collections.abc import Coroutine
 from pathlib import Path
-from typing import Any
 
 from .constants import TAG_ALREADY_EXISTS_RE, TAG_NOT_FOUND_RE
 from .exceptions import AlreadyExistsException, DoesNotExistException, GitException
@@ -19,7 +17,7 @@ __all__ = [
 
 async def list_tags(
     git_repo: Path | str, tag_pattern: str | None = None
-) -> Coroutine[Any, Any, list[str]]:
+) -> list[str]:
     """
     List all git tags or filter with a wildcard pattern
 
@@ -69,7 +67,7 @@ async def create_tag(git_repo: Path | str, tag_name: str, commit_hash: str | Non
         raise GitException(stderr)
 
 
-async def delete_tag(git_repo: Path | str, tag_name: str) -> Coroutine[Any, Any, str]:
+async def delete_tag(git_repo: Path | str, tag_name: str) -> str:
     """
     Delete a tag
 

@@ -3,10 +3,9 @@ Methods not related to git commands,
 but to help the program function
 """
 import asyncio
-from collections.abc import AsyncGenerator, Coroutine, Iterable
+from collections.abc import AsyncGenerator,  Sequence
 from pathlib import Path
 from subprocess import CompletedProcess
-from typing import Any
 
 from .constants import DEFAULT_BUFFER_SIZE
 from .exceptions import BufferedProcessError
@@ -41,7 +40,7 @@ async def chunk_yielder(input_stream: asyncio.StreamReader) -> AsyncGenerator[by
         yield chunk
 
 
-async def subprocess_run(args: Iterable[str], **kwargs) -> Coroutine[Any, Any, CompletedProcess]:
+async def subprocess_run(args: Sequence[str], **kwargs) -> CompletedProcess[bytes]:
     """
     Asynchronous alternative to using subprocess.run
 
@@ -52,10 +51,10 @@ async def subprocess_run(args: Iterable[str], **kwargs) -> Coroutine[Any, Any, C
         args[0], *args[1:], stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, **kwargs
     )
     stdout, stderr = await process.communicate()
-    return CompletedProcess(args, process.returncode, stdout, stderr)
+    return CompletedProcess(list(args), process.returncode or 0, stdout, stderr)
 
 
-async def subprocess_run_buffered(args: Iterable[str]) -> AsyncGenerator[bytes, None]:
+async def subprocess_run_buffered(args: Sequence[str]) -> AsyncGenerator[bytes, None]:
     """
     Asynchronous alternative to using subprocess.Popen using buffered reading
 

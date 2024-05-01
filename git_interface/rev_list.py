@@ -2,9 +2,7 @@
 Methods for using the 'rev-list' command
 """
 import re
-from collections.abc import Coroutine
 from pathlib import Path
-from typing import Any
 
 from .constants import UNKNOWN_REV_RE
 from .exceptions import GitException, UnknownRevisionException
@@ -19,7 +17,7 @@ __all__ = [
 
 async def _rev_list(
     git_repo: Path | str, branch: str | None = None, operator: str | None = None
-) -> Coroutine[Any, Any, str]:
+) -> str:
     if branch is None:
         branch = "--all"
     args = ["git", "-C", str(git_repo), "rev-list", branch]
@@ -37,7 +35,7 @@ async def _rev_list(
 
 async def get_commit_count(
     git_repo: Path | str, branch: str | None = None
-) -> Coroutine[Any, Any, int]:
+) -> int:
     """
     Get a repos commit count
 
@@ -52,7 +50,7 @@ async def get_commit_count(
 
 async def get_disk_usage(
     git_repo: Path | str, branch: str | None = None
-) -> Coroutine[Any, Any, int]:
+) -> int:
     """
     Get a size of the repo
 
@@ -67,7 +65,7 @@ async def get_disk_usage(
 
 async def get_rev_list(
     git_repo: Path | str, branch: str | None = None
-) -> Coroutine[Any, Any, list[str]]:
+) -> list[str]:
     """
     Get a repos revisions
 

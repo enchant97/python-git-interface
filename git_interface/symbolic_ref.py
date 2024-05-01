@@ -1,10 +1,8 @@
 """
 Methods for using git symbolic-ref command
 """
-from collections.abc import Coroutine
 from pathlib import Path
 from subprocess import CompletedProcess
-from typing import Any
 
 from .exceptions import GitException, UnknownRefException
 from .helpers import subprocess_run
@@ -50,7 +48,7 @@ async def change_symbolic_ref(git_repo: Path | str, name: str, ref: str):
     _raise_known_errors(process_status, ref)
 
 
-async def get_symbolic_ref(git_repo: Path | str, name: str) -> Coroutine[Any, Any, str]:
+async def get_symbolic_ref(git_repo: Path | str, name: str) -> str:
     """
     Get a symbolic ref in repo
 
@@ -79,7 +77,7 @@ async def delete_symbolic_ref(git_repo: Path | str, name: str):
     _raise_known_errors(process_status, name)
 
 
-async def get_active_branch(git_repo: Path | str) -> Coroutine[Any, Any, str]:
+async def get_active_branch(git_repo: Path | str) -> str:
     """
     Get the active (HEAD) reference
 

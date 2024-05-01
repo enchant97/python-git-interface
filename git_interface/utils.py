@@ -2,9 +2,7 @@
 Methods that don't fit in their own file
 """
 import os
-from collections.abc import Coroutine
 from pathlib import Path
-from typing import Any
 
 import aiofiles
 
@@ -23,7 +21,7 @@ __all__ = [
 ]
 
 
-async def get_version() -> Coroutine[Any, Any, str]:
+async def get_version() -> str:
     """
     Gets the git version
 
@@ -98,7 +96,7 @@ async def clone_repo(git_repo: Path | str, src: str, bare=False, mirror=False):
         raise GitException(process.stderr.decode())
 
 
-async def get_description(git_repo: Path | str) -> Coroutine[Any, Any, str]:
+async def get_description(git_repo: Path | str) -> str:
     """
     Gets the set description for a repo
 
@@ -134,7 +132,7 @@ async def run_maintenance(git_repo: Path | str):
         raise GitException(process.stderr.decode())
 
 
-async def add_to_staged(git_repo: Path | str, path: str, *extra_paths: tuple[str]):
+async def add_to_staged(git_repo: Path | str, path: str, *extra_paths: str):
     """
     Add files to the repository staging area
 

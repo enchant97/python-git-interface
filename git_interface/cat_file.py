@@ -2,9 +2,7 @@
 Methods for using the 'cat-file' command
 """
 import re
-from collections.abc import Coroutine
 from pathlib import Path
-from typing import Any
 
 from .constants import NOT_VALID_OBJECT_NAME_RE
 from .datatypes import TreeContentTypes
@@ -16,7 +14,7 @@ __all__ = ["get_object_size", "get_object_type", "get_pretty_print"]
 
 async def __cat_file_command(
     git_repo: Path | str, tree_ish: str, file_path: str, *flags
-) -> Coroutine[Any, Any, bytes]:
+) -> bytes:
     args = ["git", "-C", str(git_repo), "cat-file", f"{tree_ish}:{file_path}"]
     args.extend(flags)
 
@@ -48,7 +46,7 @@ async def get_object_size(git_repo: Path | str, tree_ish: str, file_path: str) -
 
 async def get_object_type(
     git_repo: Path | str, tree_ish: str, file_path: str
-) -> Coroutine[Any, Any, TreeContentTypes]:
+) -> TreeContentTypes:
     """
     Gets the object type from repo
 
@@ -59,13 +57,13 @@ async def get_object_type(
         :raises GitException: Error to do with git
         :return: The object type
     """
-    output = await __cat_file_command(git_repo, tree_ish, file_path, "-t").decode()
+    output = (await __cat_file_command(git_repo, tree_ish, file_path, "-t")).decode()
     return TreeContentTypes(output)
 
 
 async def get_pretty_print(
     git_repo: Path | str, tree_ish: str, file_path: str
-) -> Coroutine[Any, Any, bytes]:
+) -> bytes:
     """
     Gets a object from repo
 

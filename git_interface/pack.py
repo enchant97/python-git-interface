@@ -20,7 +20,7 @@ __all__ = [
 ]
 
 
-def _create_advertisement(pack_type) -> bytes:
+def _create_advertisement(pack_type: str) -> bytes:
     """
     Service type prefixed with the total line length
     """
@@ -31,7 +31,7 @@ def _create_advertisement(pack_type) -> bytes:
 
 
 async def _pack_handler(
-    git_repo: Path, pack_type: str, input_stream: AsyncGenerator[bytes, None] | None = None
+    git_repo: str, pack_type: str, input_stream: AsyncGenerator[bytes, None] | None = None
 ) -> AsyncGenerator[bytes, None]:
     """
     Used to upload or receive a pack.
@@ -49,7 +49,7 @@ async def _pack_handler(
     args = ["git", pack_type.removeprefix("git-"), "--stateless-rpc"]
     if input_stream is None:
         args.append("--http-backend-info-refs")
-    args.append(str(git_repo))
+    args.append(git_repo)
 
     process = await asyncio.create_subprocess_exec(
         args[0],
@@ -88,7 +88,7 @@ def exchange_pack(
     :param input_stream: The buffered input stream
     :return: The buffered output stream as a AsyncGenerator
     """
-    return _pack_handler(git_repo, pack_type, input_stream)
+    return _pack_handler(str(git_repo), pack_type, input_stream)
 
 
 def advertise_pack(git_repo: Path | str, pack_type: str) -> AsyncGenerator[bytes, None]:
@@ -99,11 +99,11 @@ def advertise_pack(git_repo: Path | str, pack_type: str) -> AsyncGenerator[bytes
     :param pack_type: The pack-type ('git-upload-pack' or 'git-receive-pack')
     :return: The buffered output stream as a AsyncGenerator
     """
-    return _pack_handler(git_repo, pack_type)
+    return _pack_handler(str(git_repo), pack_type)
 
 
 async def ssh_pack_exchange(
-    git_repo: str | Path, pack_type: str, stdin: AsyncGenerator[bytes, None]
+    git_repo: Path | str, pack_type: str, stdin: AsyncGenerator[bytes, None]
 ) -> AsyncGenerator[bytes, None]:
     """
     Used to handle git pack exchange for a ssh connection.

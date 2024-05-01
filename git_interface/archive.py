@@ -15,7 +15,7 @@ __all__ = [
 
 
 async def get_archive(
-    git_repo: Path | str, archive_type: ArchiveTypes, tree_ish: str = "HEAD"
+    git_repo: Path | str, archive_type: ArchiveTypes | str, tree_ish: str = "HEAD"
 ) -> bytes:
     """
     get a archive of a git repo
@@ -38,7 +38,7 @@ async def get_archive(
 
 
 async def get_archive_buffered(
-    git_repo: Path | str, archive_type: ArchiveTypes, tree_ish: str = "HEAD"
+    git_repo: Path | str, archive_type: ArchiveTypes | str, tree_ish: str = "HEAD"
 ) -> AsyncGenerator[bytes, None]:
     """
     get a archive of a git repo, but using a buffered read

@@ -1,10 +1,9 @@
 """
 Methods for using the 'show' command
 """
+from collections.abc import AsyncGenerator
 import re
-from collections.abc import AsyncGenerator, Coroutine
 from pathlib import Path
-from typing import Any
 
 from .constants import INVALID_OBJECT_NAME, PATH_DOES_NOT_EXIST
 from .exceptions import (
@@ -23,7 +22,7 @@ __all__ = [
 
 async def show_file(
     git_repo: Path | str, tree_ish: str, file_path: str
-) -> Coroutine[Any, Any, bytes]:
+) -> bytes:
     """
     Read a file from a repository
 
@@ -54,7 +53,7 @@ async def show_file(
 
 async def show_file_buffered(
     git_repo: Path | str, tree_ish: str, file_path: str
-) -> AsyncGenerator[bytes, None, None]:
+) -> AsyncGenerator[bytes, None]:
     """
     Read a file from a repository, but using a buffered read
 

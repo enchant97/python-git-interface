@@ -2,9 +2,7 @@
 Methods for using the 'branch' command
 """
 import re
-from collections.abc import Coroutine
 from pathlib import Path
-from typing import Any
 
 from .constants import BRANCH_ALREADY_EXISTS_RE, BRANCH_NOT_FOUND_RE, BRANCH_REFNAME_NOT_FOUND_RE
 from .exceptions import AlreadyExistsException, GitException, NoBranchesException
@@ -20,7 +18,7 @@ __all__ = [
 ]
 
 
-async def get_branches(git_repo: Path | str) -> Coroutine[Any, Any, tuple[str, tuple[str]]]:
+async def get_branches(git_repo: Path | str) -> tuple[str, tuple[str]]:
     """
     Get the head branch and all others
 
@@ -55,7 +53,7 @@ async def get_branches(git_repo: Path | str) -> Coroutine[Any, Any, tuple[str, t
     return head, tuple(other_branches)
 
 
-async def count_branches(git_repo: Path) -> Coroutine[Any, Any, int]:
+async def count_branches(git_repo: Path) -> int:
     """
     Count how many branches are in repo,
     returned value will be at >=0
