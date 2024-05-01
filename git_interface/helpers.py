@@ -3,7 +3,7 @@ Methods not related to git commands,
 but to help the program function
 """
 import asyncio
-from collections.abc import AsyncGenerator,  Sequence
+from collections.abc import AsyncGenerator, Sequence
 from pathlib import Path
 from subprocess import CompletedProcess
 

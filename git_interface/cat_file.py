@@ -12,9 +12,7 @@ from .helpers import subprocess_run
 __all__ = ["get_object_size", "get_object_type", "get_pretty_print"]
 
 
-async def __cat_file_command(
-    git_repo: Path | str, tree_ish: str, file_path: str, *flags
-) -> bytes:
+async def __cat_file_command(git_repo: Path | str, tree_ish: str, file_path: str, *flags) -> bytes:
     args = ["git", "-C", str(git_repo), "cat-file", f"{tree_ish}:{file_path}"]
     args.extend(flags)
 
@@ -44,9 +42,7 @@ async def get_object_size(git_repo: Path | str, tree_ish: str, file_path: str) -
     return int(await __cat_file_command(git_repo, tree_ish, file_path, "-s"))
 
 
-async def get_object_type(
-    git_repo: Path | str, tree_ish: str, file_path: str
-) -> TreeContentTypes:
+async def get_object_type(git_repo: Path | str, tree_ish: str, file_path: str) -> TreeContentTypes:
     """
     Gets the object type from repo
 
@@ -61,9 +57,7 @@ async def get_object_type(
     return TreeContentTypes(output)
 
 
-async def get_pretty_print(
-    git_repo: Path | str, tree_ish: str, file_path: str
-) -> bytes:
+async def get_pretty_print(git_repo: Path | str, tree_ish: str, file_path: str) -> bytes:
     """
     Gets a object from repo
 

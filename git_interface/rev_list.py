@@ -33,9 +33,7 @@ async def _rev_list(
     return process_status.stdout.decode()
 
 
-async def get_commit_count(
-    git_repo: Path | str, branch: str | None = None
-) -> int:
+async def get_commit_count(git_repo: Path | str, branch: str | None = None) -> int:
     """
     Get a repos commit count
 
@@ -48,9 +46,7 @@ async def get_commit_count(
     return int(await _rev_list(git_repo, branch, "--count"))
 
 
-async def get_disk_usage(
-    git_repo: Path | str, branch: str | None = None
-) -> int:
+async def get_disk_usage(git_repo: Path | str, branch: str | None = None) -> int:
     """
     Get a size of the repo
 
@@ -63,9 +59,7 @@ async def get_disk_usage(
     return int(await _rev_list(git_repo, branch, "--disk-usage"))
 
 
-async def get_rev_list(
-    git_repo: Path | str, branch: str | None = None
-) -> list[str]:
+async def get_rev_list(git_repo: Path | str, branch: str | None = None) -> list[str]:
     """
     Get a repos revisions
 

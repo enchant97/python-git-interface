@@ -1,8 +1,8 @@
 """
 Methods for using the 'show' command
 """
-from collections.abc import AsyncGenerator
 import re
+from collections.abc import AsyncGenerator
 from pathlib import Path
 
 from .constants import INVALID_OBJECT_NAME, PATH_DOES_NOT_EXIST
@@ -20,9 +20,7 @@ __all__ = [
 ]
 
 
-async def show_file(
-    git_repo: Path | str, tree_ish: str, file_path: str
-) -> bytes:
+async def show_file(git_repo: Path | str, tree_ish: str, file_path: str) -> bytes:
     """
     Read a file from a repository
 

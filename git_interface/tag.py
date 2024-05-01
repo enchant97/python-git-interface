@@ -15,9 +15,7 @@ __all__ = [
 ]
 
 
-async def list_tags(
-    git_repo: Path | str, tag_pattern: str | None = None
-) -> list[str]:
+async def list_tags(git_repo: Path | str, tag_pattern: str | None = None) -> list[str]:
     """
     List all git tags or filter with a wildcard pattern
 
