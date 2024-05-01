@@ -9,7 +9,8 @@ from quart import Response, current_app, make_response, request
 from ..pack import advertise_pack, exchange_pack
 
 __all__ = [
-    "post_pack_response", "get_info_refs_response",
+    "post_pack_response",
+    "get_info_refs_response",
 ]
 
 
@@ -25,11 +26,13 @@ async def post_pack_response(repo_path: Path, pack_type: str) -> Response:
         :return: The created response
     """
     async with timeout(current_app.config["BODY_TIMEOUT"]):
-        response = await make_response(exchange_pack(
-            repo_path,
-            pack_type,
-            request.body,
-        ))
+        response = await make_response(
+            exchange_pack(
+                repo_path,
+                pack_type,
+                request.body,
+            )
+        )
     response.content_type = f"application/x-{pack_type}-result"
     response.headers.add_header("Cache-Control", "no-store")
     response.headers.add_header("Expires", "0")
@@ -47,10 +50,12 @@ async def get_info_refs_response(repo_path, pack_type) -> Response:
         :param pack_type: The pack-type
         :return: The created response
     """
-    response = await make_response(advertise_pack(
-        repo_path,
-        pack_type,
-    ))
+    response = await make_response(
+        advertise_pack(
+            repo_path,
+            pack_type,
+        )
+    )
     response.content_type = f"application/x-{pack_type}-advertisement"
     response.headers.add_header("Cache-Control", "no-store")
     response.headers.add_header("Expires", "0")

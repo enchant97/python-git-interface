@@ -4,23 +4,26 @@ Methods for using the 'show' command
 import re
 from collections.abc import AsyncGenerator, Coroutine
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 from .constants import INVALID_OBJECT_NAME, PATH_DOES_NOT_EXIST
-from .exceptions import (BufferedProcessError, GitException,
-                         PathDoesNotExistInRevException,
-                         UnknownRevisionException)
+from .exceptions import (
+    BufferedProcessError,
+    GitException,
+    PathDoesNotExistInRevException,
+    UnknownRevisionException,
+)
 from .helpers import subprocess_run, subprocess_run_buffered
 
 __all__ = [
-    "show_file", "show_file_buffered",
+    "show_file",
+    "show_file_buffered",
 ]
 
 
 async def show_file(
-        git_repo: Union[Path, str],
-        tree_ish: str,
-        file_path: str) -> Coroutine[Any, Any, bytes]:
+    git_repo: Path | str, tree_ish: str, file_path: str
+) -> Coroutine[Any, Any, bytes]:
     """
     Read a file from a repository
 
@@ -39,18 +42,19 @@ async def show_file(
     if process_status.returncode != 0:
         stderr = process_status.stderr.decode()
         if re.match(INVALID_OBJECT_NAME, stderr):
-            raise UnknownRevisionException(f"Unknown tree-ish '{tree_ish}'")
-        elif re.match(PATH_DOES_NOT_EXIST, stderr):
-            raise PathDoesNotExistInRevException(f"'{file_path}' not found in repo")
+            msg = f"Unknown tree-ish '{tree_ish}'"
+            raise UnknownRevisionException(msg)
+        if re.match(PATH_DOES_NOT_EXIST, stderr):
+            msg = f"'{file_path}' not found in repo"
+            raise PathDoesNotExistInRevException(msg)
         raise GitException(stderr)
 
     return process_status.stdout
 
 
 async def show_file_buffered(
-        git_repo: Union[Path, str],
-        tree_ish: str,
-        file_path: str) -> AsyncGenerator[bytes, None, None]:
+    git_repo: Path | str, tree_ish: str, file_path: str
+) -> AsyncGenerator[bytes, None, None]:
     """
     Read a file from a repository, but using a buffered read
 

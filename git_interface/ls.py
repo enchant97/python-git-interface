@@ -4,7 +4,7 @@ Methods for using the 'ls-tree' command
 import re
 from collections.abc import Coroutine, Iterator
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
 from .constants import LS_TREE_LONG_RE, LS_TREE_RE, NOT_VALID_OBJECT_NAME_RE
 from .datatypes import TreeContent
@@ -44,11 +44,8 @@ def __ls_tree_process_line_long(line: str) -> TreeContent:
 
 
 async def ls_tree(
-        git_repo: Union[Path, str],
-        tree_ish: str,
-        recursive: bool,
-        use_long: bool,
-        path: Optional[Path] = None) -> Coroutine[Any, Any, Iterator[TreeContent]]:
+    git_repo: Path | str, tree_ish: str, recursive: bool, use_long: bool, path: Path | None = None
+) -> Coroutine[Any, Any, Iterator[TreeContent]]:
     """
     Get the tree of objects in repo
 
@@ -75,7 +72,8 @@ async def ls_tree(
     if not process_status.stdout and process_status.returncode != 0:
         stderr = process_status.stderr.decode()
         if re.match(NOT_VALID_OBJECT_NAME_RE, stderr):
-            raise UnknownRevisionException(f"Unknown tree-ish '{tree_ish}'")
+            msg = f"Unknown tree-ish '{tree_ish}'"
+            raise UnknownRevisionException(msg)
         raise GitException(stderr)
 
     split_lines = process_status.stdout.decode().strip().split("\n")

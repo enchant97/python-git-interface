@@ -4,7 +4,7 @@ Methods that don't fit in their own file
 import os
 from collections.abc import Coroutine
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
 import aiofiles
 
@@ -12,10 +12,14 @@ from .exceptions import AlreadyExistsException, GitException
 from .helpers import ensure_path, subprocess_run
 
 __all__ = [
-    "get_version", "init_repo",
-    "clone_repo", "get_description",
-    "set_description", "run_maintenance",
-    "add_to_staged", "commit_staged",
+    "get_version",
+    "init_repo",
+    "clone_repo",
+    "get_description",
+    "set_description",
+    "run_maintenance",
+    "add_to_staged",
+    "commit_staged",
 ]
 
 
@@ -34,10 +38,8 @@ async def get_version() -> Coroutine[Any, Any, str]:
 
 
 async def init_repo(
-        repo_dir: Path,
-        repo_name: str,
-        bare: bool = True,
-        default_branch: Optional[str] = None):
+    repo_dir: Path, repo_name: str, bare: bool = True, default_branch: str | None = None
+):
     """
     Creates a new git repo in the directory with the given name,
     if bare the repo name will have .git added at the end.
@@ -53,8 +55,9 @@ async def init_repo(
         repo_name = repo_name + ".git"
     repo_path = repo_dir / repo_name
 
-    if (repo_path.exists()):
-        raise AlreadyExistsException(f"path already exists for '{repo_name}'")
+    if repo_path.exists():
+        msg = f"path already exists for '{repo_name}'"
+        raise AlreadyExistsException(msg)
 
     args = ["git", "init", str(repo_path), "--quiet"]
     if bare:
@@ -66,7 +69,7 @@ async def init_repo(
         raise GitException(process.stderr.decode())
 
 
-async def clone_repo(git_repo: Union[Path, str], src: str, bare=False, mirror=False):
+async def clone_repo(git_repo: Path | str, src: str, bare=False, mirror=False):
     """
     Clone an exiting repo, please note this
     method has no way of passing passwords+usernames
@@ -81,15 +84,11 @@ async def clone_repo(git_repo: Union[Path, str], src: str, bare=False, mirror=Fa
     args = ["git", "clone", src, str(git_repo)]
 
     # disables interactive password prompt
-    env = {
-        **os.environ,
-        "GCM_INTERACTIVE": "never",
-        "GIT_TERMINAL_PROMPT": "0"
-    }
+    env = {**os.environ, "GCM_INTERACTIVE": "never", "GIT_TERMINAL_PROMPT": "0"}
 
     if mirror and bare:
         raise ValueError("both bare and mirror cannot be used at same time")
-    elif bare:
+    if bare:
         args.append("--bare")
     elif mirror:
         args.append("--mirror")
@@ -99,7 +98,7 @@ async def clone_repo(git_repo: Union[Path, str], src: str, bare=False, mirror=Fa
         raise GitException(process.stderr.decode())
 
 
-async def get_description(git_repo: Union[Path, str]) -> Coroutine[Any, Any, str]:
+async def get_description(git_repo: Path | str) -> Coroutine[Any, Any, str]:
     """
     Gets the set description for a repo
 
@@ -111,7 +110,7 @@ async def get_description(git_repo: Union[Path, str]) -> Coroutine[Any, Any, str
         return await fo.read()
 
 
-async def set_description(git_repo: Union[Path, str], description: str):
+async def set_description(git_repo: Path | str, description: str):
     """
     Sets the set description for a repo
 
@@ -122,7 +121,7 @@ async def set_description(git_repo: Union[Path, str], description: str):
         await fo.write(description)
 
 
-async def run_maintenance(git_repo: Union[Path, str]):
+async def run_maintenance(git_repo: Path | str):
     """
     Run a maintenance git command to specified repo
 
@@ -135,7 +134,7 @@ async def run_maintenance(git_repo: Union[Path, str]):
         raise GitException(process.stderr.decode())
 
 
-async def add_to_staged(git_repo: Union[Path, str], path: str, *extra_paths: tuple[str]):
+async def add_to_staged(git_repo: Path | str, path: str, *extra_paths: tuple[str]):
     """
     Add files to the repository staging area
 
@@ -150,11 +149,11 @@ async def add_to_staged(git_repo: Union[Path, str], path: str, *extra_paths: tup
 
     process = await subprocess_run(args)
     if process.returncode != 0:
-        # TODO handle more specific exceptions
+        # TODO: handle more specific exceptions
         raise GitException(process.stderr.decode())
 
 
-async def commit_staged(git_repo: Union[Path, str], messages: Union[str, tuple[str]]):
+async def commit_staged(git_repo: Path | str, messages: str | tuple[str]):
     """
     Commit staged files with a message(s)
 
@@ -164,13 +163,13 @@ async def commit_staged(git_repo: Union[Path, str], messages: Union[str, tuple[s
     """
     args = ["git", "-C", str(git_repo), "commit"]
 
-    if (isinstance(messages, str)):
+    if isinstance(messages, str):
         messages = (messages,)
 
     for content in messages:
-        args.extend(("-m", f"\"{content}\""))
+        args.extend(("-m", f'"{content}"'))
 
     process = await subprocess_run(args)
     if process.returncode != 0:
-        # TODO handle more specific exceptions
+        # TODO: handle more specific exceptions
         raise GitException(process.stderr.decode())

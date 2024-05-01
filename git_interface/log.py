@@ -5,21 +5,25 @@ import re
 from collections.abc import Coroutine, Iterator
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from .constants import EMPTY_REPO_RE, UNKNOWN_REV_RE
 from .datatypes import Log
-from .exceptions import (GitException, NoCommitsException, NoLogsException,
-                         UnknownRevisionException)
+from .exceptions import GitException, NoCommitsException, NoLogsException, UnknownRevisionException
 from .helpers import subprocess_run
 
 __all__ = ["get_logs"]
 
+# formats: https://git-scm.com/docs/pretty-formats
+LOG_FMT_STRING = "%H;;%P;;%ae;;%an;;%cI;;%s"
+LOG_PARTS_COUNT = LOG_FMT_STRING.count("%")
+
 
 def __process_log(stdout_line: str) -> Log:
     parts = stdout_line.split(";;")
-    if len(parts) != 6:
-        raise ValueError(f"invalid log line: {stdout_line}")
+    if len(parts) != LOG_PARTS_COUNT:
+        msg = f"invalid log line: {stdout_line}"
+        raise ValueError(msg)
     return Log(
         parts[0],
         parts[1],
@@ -36,11 +40,12 @@ def __process_logs(stdout: str) -> Iterator[Log]:
 
 
 async def get_logs(
-        git_repo: Path,
-        branch: Optional[str] = None,
-        max_number: Optional[int] = None,
-        since: Optional[datetime] = None,
-        until: Optional[datetime] = None) -> Coroutine[Any, Any, Iterator[Log]]:
+    git_repo: Path,
+    branch: str | None = None,
+    max_number: int | None = None,
+    since: datetime | None = None,
+    until: datetime | None = None,
+) -> Coroutine[Any, Any, Iterator[Log]]:
     """
     Generate git logs from a repo
 
@@ -65,18 +70,19 @@ async def get_logs(
         args.append(f"--since={since.isoformat()}")
     if until is not None:
         args.append(f"--until={until.isoformat()}")
-    # formats: https://git-scm.com/docs/pretty-formats
-    args.append("--pretty=%H;;%P;;%ae;;%an;;%cI;;%s")
+    args.append(f"--pretty={LOG_FMT_STRING}")
 
     process_status = await subprocess_run(args)
     if not process_status.stdout:
         stderr = process_status.stderr.decode()
         if re.match(EMPTY_REPO_RE, stderr):
-            raise NoCommitsException()
+            raise NoCommitsException
         if re.match(UNKNOWN_REV_RE, stderr):
-            raise UnknownRevisionException(f"unknown revision/branch {branch}")
+            msg = f"unknown revision/branch {branch}"
+            raise UnknownRevisionException(msg)
         if process_status.returncode != 0:
             raise GitException(stderr)
-        raise NoLogsException(f"no logs found (using given filters) for '{git_repo.name}'")
+        msg = f"no logs found (using given filters) for '{git_repo.name}'"
+        raise NoLogsException(msg)
     stdout = process_status.stdout.decode()
     return __process_logs(stdout)

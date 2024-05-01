@@ -4,7 +4,7 @@ Methods for using the 'cat-file' command
 import re
 from collections.abc import Coroutine
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 from .constants import NOT_VALID_OBJECT_NAME_RE
 from .datatypes import TreeContentTypes
@@ -15,9 +15,8 @@ __all__ = ["get_object_size", "get_object_type", "get_pretty_print"]
 
 
 async def __cat_file_command(
-        git_repo: Union[Path, str],
-        tree_ish: str,
-        file_path: str, *flags) -> Coroutine[Any, Any, bytes]:
+    git_repo: Path | str, tree_ish: str, file_path: str, *flags
+) -> Coroutine[Any, Any, bytes]:
     args = ["git", "-C", str(git_repo), "cat-file", f"{tree_ish}:{file_path}"]
     args.extend(flags)
 
@@ -26,13 +25,14 @@ async def __cat_file_command(
     if process_status.returncode != 0:
         stderr = process_status.stderr.decode()
         if re.match(NOT_VALID_OBJECT_NAME_RE, stderr):
-            raise UnknownRevisionException(f"Invalid object name '{tree_ish}:{file_path}'")
+            msg = f"Invalid object name '{tree_ish}:{file_path}'"
+            raise UnknownRevisionException(msg)
         raise GitException(stderr)
 
     return process_status.stdout
 
 
-async def get_object_size(git_repo: Union[Path, str], tree_ish: str, file_path: str) -> int:
+async def get_object_size(git_repo: Path | str, tree_ish: str, file_path: str) -> int:
     """
     Gets the objects size from repo
 
@@ -47,9 +47,8 @@ async def get_object_size(git_repo: Union[Path, str], tree_ish: str, file_path: 
 
 
 async def get_object_type(
-        git_repo: Union[Path, str],
-        tree_ish: str,
-        file_path: str) -> Coroutine[Any, Any, TreeContentTypes]:
+    git_repo: Path | str, tree_ish: str, file_path: str
+) -> Coroutine[Any, Any, TreeContentTypes]:
     """
     Gets the object type from repo
 
@@ -64,7 +63,9 @@ async def get_object_type(
     return TreeContentTypes(output)
 
 
-async def get_pretty_print(git_repo: Union[Path, str], tree_ish: str, file_path: str) -> Coroutine[Any, Any, bytes]:
+async def get_pretty_print(
+    git_repo: Path | str, tree_ish: str, file_path: str
+) -> Coroutine[Any, Any, bytes]:
     """
     Gets a object from repo
 

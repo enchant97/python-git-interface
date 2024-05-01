@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 __all__ = ["Log", "ArchiveTypes"]
 
@@ -14,6 +13,7 @@ class ArchiveTypes(Enum):
     """
     Possible archive types
     """
+
     TAR = "tar"
     TAR_GZ = "tar.gz"
     ZIP = "zip"
@@ -23,6 +23,7 @@ class TreeContentTypes(Enum):
     """
     Tree content types
     """
+
     TREE = "tree"
     BLOB = "blob"
 
@@ -32,6 +33,7 @@ class Log:
     """
     Represents a single git log
     """
+
     commit_hash: str
     parent_hash: str
     author_email: str
@@ -45,11 +47,12 @@ class TreeContent:
     """
     Reperesents a single 'ls-tree' entry
     """
+
     mode: str
     type_: TreeContentTypes
     object_: str
     file: Path
-    object_size: Optional[int] = None
+    object_size: int | None = None
 
     @classmethod
     def from_str_values(cls, **kwargs):

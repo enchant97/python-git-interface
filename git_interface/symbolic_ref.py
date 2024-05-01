@@ -4,14 +4,16 @@ Methods for using git symbolic-ref command
 from collections.abc import Coroutine
 from pathlib import Path
 from subprocess import CompletedProcess
-from typing import Any, Union
+from typing import Any
 
 from .exceptions import GitException, UnknownRefException
 from .helpers import subprocess_run
 
 __all__ = [
-    "change_symbolic_ref", "get_symbolic_ref",
-    "delete_symbolic_ref", "get_active_branch",
+    "change_symbolic_ref",
+    "get_symbolic_ref",
+    "delete_symbolic_ref",
+    "get_active_branch",
     "change_active_branch",
 ]
 
@@ -27,12 +29,13 @@ def _raise_known_errors(process_status: CompletedProcess, ref: str):
         :raises GitException: Error to do with git
     """
     if process_status.returncode == 1:
-        raise UnknownRefException(f"Unknown ref {ref}")
-    elif process_status.returncode > 0:
+        msg = f"Unknown ref {ref}"
+        raise UnknownRefException(msg)
+    if process_status.returncode > 0:
         raise GitException(process_status.stderr.decode())
 
 
-async def change_symbolic_ref(git_repo: Union[Path, str], name: str, ref: str):
+async def change_symbolic_ref(git_repo: Path | str, name: str, ref: str):
     """
     Change a symbolic ref in repo
 
@@ -47,7 +50,7 @@ async def change_symbolic_ref(git_repo: Union[Path, str], name: str, ref: str):
     _raise_known_errors(process_status, ref)
 
 
-async def get_symbolic_ref(git_repo: Union[Path, str], name: str) -> Coroutine[Any, Any, str]:
+async def get_symbolic_ref(git_repo: Path | str, name: str) -> Coroutine[Any, Any, str]:
     """
     Get a symbolic ref in repo
 
@@ -62,7 +65,7 @@ async def get_symbolic_ref(git_repo: Union[Path, str], name: str) -> Coroutine[A
     return process_status.stdout.decode().strip()
 
 
-async def delete_symbolic_ref(git_repo: Union[Path, str], name: str):
+async def delete_symbolic_ref(git_repo: Path | str, name: str):
     """
     Delete a symbolic ref in repo
 
@@ -76,7 +79,7 @@ async def delete_symbolic_ref(git_repo: Union[Path, str], name: str):
     _raise_known_errors(process_status, name)
 
 
-async def get_active_branch(git_repo: Union[Path, str]) -> Coroutine[Any, Any, str]:
+async def get_active_branch(git_repo: Path | str) -> Coroutine[Any, Any, str]:
     """
     Get the active (HEAD) reference
 
@@ -87,7 +90,7 @@ async def get_active_branch(git_repo: Union[Path, str]) -> Coroutine[Any, Any, s
     return await get_symbolic_ref(git_repo, "HEAD")
 
 
-async def change_active_branch(git_repo: Union[Path, str], branch: str):
+async def change_active_branch(git_repo: Path | str, branch: str):
     """
     Change the active (HEAD) reference
 

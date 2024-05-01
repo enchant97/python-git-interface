@@ -3,7 +3,6 @@ import re
 import sys
 from os import environ
 from pathlib import Path
-from typing import Optional, Union
 
 import asyncssh
 
@@ -11,19 +10,18 @@ from ..constants import VALID_SSH_COMMAND_RE
 from ..pack import ssh_pack_exchange
 from ..shared import logger
 
-__all__ = [
-    "NoAuthHandler", "Server"
-]
+__all__ = ["NoAuthHandler", "Server"]
 
 
 class NoAuthHandler(asyncssh.SSHServer):
     """
     basic ssh server handler that provides no authentication
     """
-    def connection_made(self, conn: asyncssh.SSHServerConnection):
-        logger.info("SSH connection received from: %s", conn.get_extra_info('peername')[0])
 
-    def connection_lost(self, exc: Optional[Exception]):
+    def connection_made(self, conn: asyncssh.SSHServerConnection):
+        logger.info("SSH connection received from: %s", conn.get_extra_info("peername")[0])
+
+    def connection_lost(self, exc: Exception | None):
         if exc:
             logger.error("SSH connection closed, with error: %s", exc)
         else:
@@ -42,17 +40,15 @@ class Server:
     Handles creation of a ssh server, with client handler
     that can inherited to adjust functionality
     """
+
     _no_command_msg = b"Successfully authenticated, but this server does not provide shell access"
     _no_repo_msg = b"request path does not exist, or you do not have access"
 
-    def __init__(
-            self,
-            root_repo_path: str,
-            handler_class: asyncssh.SSHServer = NoAuthHandler):
+    def __init__(self, root_repo_path: Path, handler_class: asyncssh.SSHServer = NoAuthHandler):
         self._root_repo_path = root_repo_path
         self._handler_class = handler_class
 
-    def ensure_valid_repo(self, requested_repo: str, username: str) -> Union[Path, None]:
+    def ensure_valid_repo(self, requested_repo: str, username: str) -> Path | None:  # noqa: ARG002
         """
         Used to ensure a given path is a valid repo,
         username currently not used but this method
@@ -65,8 +61,9 @@ class Server:
         repo_path: Path = self._root_repo_path / requested_repo.removeprefix("/")
         if repo_path.exists():
             return repo_path
+        return None
 
-    def peer_allowed(peername: str) -> bool:
+    def peer_allowed(self, peername: str) -> bool:  # noqa: ARG002
         """
         Blueprint method used to validate
         whether a peername is allowed to use ssh,
@@ -76,7 +73,7 @@ class Server:
         """
         return True
 
-    def username_valid(username: str) -> bool:
+    def username_valid(self, username: str) -> bool:  # noqa: ARG002
         """
         Blueprint method used to validate
         whether a username is valid,
@@ -95,8 +92,8 @@ class Server:
 
             :param process: The SSHServerProcess
         """
-        peer_name = process.get_extra_info('peername')[0]
-        username = process.get_extra_info('username')
+        peer_name = process.get_extra_info("peername")[0]
+        username = process.get_extra_info("username")
 
         if not self.peer_allowed(peer_name):
             logger.error("client with peername: '%s' was denied", peer_name)
@@ -117,10 +114,7 @@ class Server:
 
         if match := re.match(VALID_SSH_COMMAND_RE, process.command):
             pack_type = match.group(1)
-            logger.debug(
-                "pack_type: '%s' received from '%s'",
-                pack_type, peer_name
-            )
+            logger.debug("pack_type: '%s' received from '%s'", pack_type, peer_name)
 
             repo_path = match.group(2)
             logger.debug("repo path: '%s' received from '%s'", repo_path, peer_name)
@@ -147,10 +141,12 @@ class Server:
             :return: The created SSH server
         """
         return await asyncssh.create_server(
-            self._handler_class, host, port,
+            self._handler_class,
+            host,
+            port,
             server_host_keys=host_keys,
             process_factory=self.handle_client,
-            encoding=None
+            encoding=None,
         )
 
 
@@ -170,4 +166,4 @@ if __name__ == "__main__":
         loop.run_until_complete(main())
         loop.run_forever()
     except (OSError, asyncssh.Error) as exc:
-        sys.exit('Error starting server: ' + str(exc))
+        sys.exit("Error starting server: " + str(exc))

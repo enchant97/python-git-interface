@@ -2,8 +2,8 @@
 Methods for using commands relating to git packs
 """
 import asyncio
+from collections.abc import AsyncGenerator
 from pathlib import Path
-from typing import AsyncGenerator, Union
 
 from .constants import ALLOWED_PACK_TYPES, RECEIVE_PACK_TYPE, UPLOAD_PACK_TYPE
 from .exceptions import BufferedProcessError
@@ -11,9 +11,12 @@ from .helpers import chunk_yielder
 from .shared import logger
 
 __all__ = [
-    "UPLOAD_PACK_TYPE", "RECEIVE_PACK_TYPE",
-    "ALLOWED_PACK_TYPES", "exchange_pack",
-    "advertise_pack", "ssh_pack_exchange",
+    "UPLOAD_PACK_TYPE",
+    "RECEIVE_PACK_TYPE",
+    "ALLOWED_PACK_TYPES",
+    "exchange_pack",
+    "advertise_pack",
+    "ssh_pack_exchange",
 ]
 
 
@@ -24,15 +27,12 @@ def _create_advertisement(pack_type) -> bytes:
     advertisement = f"# service={pack_type}\n".encode()
     hex_len = hex(len(advertisement) + 4)[2:]
     hex_len = hex_len.zfill(4)
-    advertisement = hex_len.encode() + advertisement + b"0000"
-    return advertisement
+    return hex_len.encode() + advertisement + b"0000"
 
 
 async def _pack_handler(
-        git_repo: Path,
-        pack_type: str,
-        input_stream: Union[AsyncGenerator[bytes, None], None] = None
-    ) -> AsyncGenerator[bytes, None]:
+    git_repo: Path, pack_type: str, input_stream: AsyncGenerator[bytes, None] | None = None
+) -> AsyncGenerator[bytes, None]:
     """
     Used to upload or receive a pack.
 
@@ -52,7 +52,8 @@ async def _pack_handler(
     args.append(str(git_repo))
 
     process = await asyncio.create_subprocess_exec(
-        args[0], *args[1:],
+        args[0],
+        *args[1:],
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
@@ -77,9 +78,8 @@ async def _pack_handler(
 
 
 def exchange_pack(
-        git_repo: Union[Path, str],
-        pack_type: str,
-        input_stream: AsyncGenerator[bytes, None]) -> AsyncGenerator[bytes, None]:
+    git_repo: Path | str, pack_type: str, input_stream: AsyncGenerator[bytes, None]
+) -> AsyncGenerator[bytes, None]:
     """
     Used to exchange packs between client and remote.
 
@@ -91,9 +91,7 @@ def exchange_pack(
     return _pack_handler(git_repo, pack_type, input_stream)
 
 
-def advertise_pack(
-        git_repo: Union[Path, str],
-        pack_type: str) -> AsyncGenerator[bytes, None]:
+def advertise_pack(git_repo: Path | str, pack_type: str) -> AsyncGenerator[bytes, None]:
     """
     Used to advertise packs between remote and client.
 
@@ -105,9 +103,8 @@ def advertise_pack(
 
 
 async def ssh_pack_exchange(
-        git_repo: Union[str, Path],
-        pack_type: str,
-        stdin: AsyncGenerator[bytes, None]) -> AsyncGenerator[bytes, None]:
+    git_repo: str | Path, pack_type: str, stdin: AsyncGenerator[bytes, None]
+) -> AsyncGenerator[bytes, None]:
     """
     Used to handle git pack exchange for a ssh connection.
 

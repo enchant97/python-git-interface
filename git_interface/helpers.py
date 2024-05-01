@@ -6,18 +6,20 @@ import asyncio
 from collections.abc import AsyncGenerator, Coroutine, Iterable
 from pathlib import Path
 from subprocess import CompletedProcess
-from typing import Any, Union
+from typing import Any
 
 from .constants import DEFAULT_BUFFER_SIZE
 from .exceptions import BufferedProcessError
 
 __all__ = [
-    "ensure_path", "chunk_yielder",
-    "subprocess_run", "subprocess_run_buffered",
+    "ensure_path",
+    "chunk_yielder",
+    "subprocess_run",
+    "subprocess_run_buffered",
 ]
 
 
-def ensure_path(path_or_str: Union[Path, str]) -> Path:
+def ensure_path(path_or_str: Path | str) -> Path:
     """
     Ensures that given value is a pathlib.Path object.
 
@@ -47,10 +49,7 @@ async def subprocess_run(args: Iterable[str], **kwargs) -> Coroutine[Any, Any, C
         :return: The completed process
     """
     process = await asyncio.create_subprocess_exec(
-        args[0], *args[1:],
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        **kwargs
+        args[0], *args[1:], stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, **kwargs
     )
     stdout, stderr = await process.communicate()
     return CompletedProcess(args, process.returncode, stdout, stderr)
@@ -65,7 +64,8 @@ async def subprocess_run_buffered(args: Iterable[str]) -> AsyncGenerator[bytes, 
         :yield: Each read content section
     """
     process = await asyncio.create_subprocess_exec(
-        args[0], *args[1:],
+        args[0],
+        *args[1:],
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )

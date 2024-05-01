@@ -4,22 +4,22 @@ Methods for using the 'rev-list' command
 import re
 from collections.abc import Coroutine
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
 from .constants import UNKNOWN_REV_RE
 from .exceptions import GitException, UnknownRevisionException
 from .helpers import subprocess_run
 
 __all__ = [
-    "get_commit_count", "get_disk_usage",
+    "get_commit_count",
+    "get_disk_usage",
     "get_rev_list",
 ]
 
 
 async def _rev_list(
-        git_repo: Union[Path, str],
-        branch: Optional[str] = None,
-        operator: Optional[str] = None) -> Coroutine[Any, Any, str]:
+    git_repo: Path | str, branch: str | None = None, operator: str | None = None
+) -> Coroutine[Any, Any, str]:
     if branch is None:
         branch = "--all"
     args = ["git", "-C", str(git_repo), "rev-list", branch]
@@ -36,8 +36,8 @@ async def _rev_list(
 
 
 async def get_commit_count(
-        git_repo: Union[Path, str],
-        branch: Optional[str] = None) -> Coroutine[Any, Any, int]:
+    git_repo: Path | str, branch: str | None = None
+) -> Coroutine[Any, Any, int]:
     """
     Get a repos commit count
 
@@ -51,8 +51,8 @@ async def get_commit_count(
 
 
 async def get_disk_usage(
-        git_repo: Union[Path, str],
-        branch: Optional[str] = None) -> Coroutine[Any, Any, int]:
+    git_repo: Path | str, branch: str | None = None
+) -> Coroutine[Any, Any, int]:
     """
     Get a size of the repo
 
@@ -66,8 +66,8 @@ async def get_disk_usage(
 
 
 async def get_rev_list(
-        git_repo: Union[Path, str],
-        branch: Optional[str] = None) -> Coroutine[Any, Any, list[str]]:
+    git_repo: Path | str, branch: str | None = None
+) -> Coroutine[Any, Any, list[str]]:
     """
     Get a repos revisions
 

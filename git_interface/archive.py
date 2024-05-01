@@ -1,22 +1,22 @@
 """
 Methods used for 'archive' command
 """
+from collections.abc import AsyncGenerator
 from pathlib import Path
-from typing import AsyncGenerator, Union
 
 from .datatypes import ArchiveTypes
 from .exceptions import BufferedProcessError, GitException
 from .helpers import subprocess_run, subprocess_run_buffered
 
 __all__ = [
-    "get_archive", "get_archive_buffered",
+    "get_archive",
+    "get_archive_buffered",
 ]
 
 
 async def get_archive(
-        git_repo: Union[Path, str],
-        archive_type: ArchiveTypes,
-        tree_ish: str = "HEAD") -> bytes:
+    git_repo: Path | str, archive_type: ArchiveTypes, tree_ish: str = "HEAD"
+) -> bytes:
     """
     get a archive of a git repo
 
@@ -38,9 +38,8 @@ async def get_archive(
 
 
 async def get_archive_buffered(
-        git_repo: Union[Path, str],
-        archive_type: ArchiveTypes,
-        tree_ish: str = "HEAD") -> AsyncGenerator[bytes, None]:
+    git_repo: Path | str, archive_type: ArchiveTypes, tree_ish: str = "HEAD"
+) -> AsyncGenerator[bytes, None]:
     """
     get a archive of a git repo, but using a buffered read
 
